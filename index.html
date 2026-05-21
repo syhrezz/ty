@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WoodTrack</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Grade color tokens */
+        .grade-chip-A {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1.5px solid #86efac;
+        }
+
+        .grade-chip-B {
+            background: #dbeafe;
+            color: #1d4ed8;
+            border: 1.5px solid #93c5fd;
+        }
+
+        .grade-chip-C {
+            background: #fef9c3;
+            color: #92400e;
+            border: 1.5px solid #fde047;
+        }
+
+        .grade-chip-D {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1.5px solid #fca5a5;
+        }
+
+        .grade-btn {
+            border: 2px solid transparent;
+            border-radius: 14px;
+            padding: 10px 0;
+            text-align: center;
+            transition: all .15s;
+        }
+
+        .grade-btn-A {
+            background: #dcfce7;
+            color: #15803d;
+            border-color: #86efac;
+        }
+
+        .grade-btn-A.sel {
+            background: #16a34a;
+            color: #fff;
+            border-color: #15803d;
+        }
+
+        .grade-btn-B {
+            background: #dbeafe;
+            color: #1d4ed8;
+            border-color: #93c5fd;
+        }
+
+        .grade-btn-B.sel {
+            background: #2563eb;
+            color: #fff;
+            border-color: #1d4ed8;
+        }
+
+        .grade-btn-C {
+            background: #fef9c3;
+            color: #92400e;
+            border-color: #fde047;
+        }
+
+        .grade-btn-C.sel {
+            background: #ca8a04;
+            color: #fff;
+            border-color: #92400e;
+        }
+
+        .grade-btn-D {
+            background: #fee2e2;
+            color: #991b1b;
+            border-color: #fca5a5;
+        }
+
+        .grade-btn-D.sel {
+            background: #dc2626;
+            color: #fff;
+            border-color: #991b1b;
+        }
+
+        .size-btn {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 10px 0;
+            text-align: center;
+            background: #f9fafb;
+            transition: all .15s;
+        }
+
+        .size-btn.sel {
+            background: #78350f;
+            color: #fff;
+            border-color: #78350f;
+        }
+
+        .tab-line {
+            position: relative;
+        }
+
+        .tab-line::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: #92400e;
+            border-radius: 2px;
+            transition: width .2s;
+        }
+
+        .tab-line.active::after {
+            width: 60%;
+        }
+
+        .tab-line.active {
+            color: #92400e;
+            font-weight: 600;
+        }
+
+        .nav-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #92400e;
+            margin: 0 auto 2px;
+            opacity: 0;
+            transition: opacity .2s;
+        }
+
+        .nav-active .nav-dot {
+            opacity: 1;
+        }
+
+        .nav-active {
+            color: #92400e;
+        }
+
+        .slide-up {
+            animation: su .25s ease both;
+        }
+
+        @keyframes su {
+            from {
+                transform: translateY(16px);
+                opacity: 0
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1
+            }
+        }
+
+        .toast-anim {
+            animation: ta 2.8s ease forwards;
+        }
+
+        @keyframes ta {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, 8px)
+            }
+
+            12% {
+                opacity: 1;
+                transform: translate(-50%, 0)
+            }
+
+            80% {
+                opacity: 1
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -6px)
+            }
+        }
+
+        .saw-sel {
+            background: #f0fdf4 !important;
+            border-color: #16a34a !important;
+        }
+
+        .saw-sel-blue {
+            background: #eff6ff !important;
+            border-color: #2563eb !important;
+        }
+
+        input[type=date]::-webkit-calendar-picker-indicator {
+            opacity: 0.5;
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid #f1f5f9;
+            border-radius: 18px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .06);
+        }
+
+        .section-head {
+            font-size: 10px;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-bottom: 10px;
+        }
+
+        .modal-sheet {
+            position: fixed;
+            inset: 0;
+            z-index: 60;
+            background: rgba(0, 0, 0, .45);
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .modal-sheet.hidden {
+            display: none;
+        }
+
+        .sheet-body {
+            background: #fff;
+            width: 100%;
+            max-width: 430px;
+            margin: 0 auto;
+            border-radius: 24px 24px 0 0;
+            padding: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            appearance: none;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 max-w-[430px] mx-auto min-h-screen relative">
+
+    <!-- Toast -->
+    <div id="toast"
+        class="hidden fixed top-5 left-1/2 z-50 px-4 py-2 rounded-full text-xs font-semibold shadow-lg pointer-events-none"
+        style="transform:translateX(-50%)"></div>
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 max-w-[430px] mx-auto bg-white border-b border-gray-100 z-40 px-5"
+        style="padding-top:env(safe-area-inset-top,0)">
+        <div class="flex items-center justify-between h-14">
+            <div>
+                <h1 class="text-sm font-bold text-gray-900 leading-tight" id="page-title">WoodTrack</h1>
+                <p class="text-xs text-gray-400 leading-tight" id="page-sub">Sistem Produksi Kayu</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <div id="hdr-badge"
+                    class="hidden bg-amber-50 border border-amber-200 rounded-full px-3 py-1 text-xs font-semibold text-amber-800">
+                </div>
+                <div class="w-8 h-8 rounded-full bg-amber-800 flex items-center justify-center">
+                    <span class="text-xs font-bold text-white">WK</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <main class="pt-14 pb-20 min-h-screen" id="main"></main>
+
+    <!-- Bottom Nav -->
+    <nav class="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto bg-white border-t border-gray-100 z-40"
+        style="padding-bottom:env(safe-area-inset-bottom,0)">
+        <div class="flex h-16">
+            <button onclick="go('beranda')" data-nav="beranda"
+                class="nav-active flex-1 flex flex-col items-center justify-center gap-0.5 text-gray-400 transition-colors">
+                <div class="nav-dot"></div>
+                <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span class="text-[10px] font-medium">Beranda</span>
+            </button>
+            <button onclick="go('terima')" data-nav="terima"
+                class="flex-1 flex flex-col items-center justify-center gap-0.5 text-gray-400 transition-colors">
+                <div class="nav-dot"></div>
+                <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                <span class="text-[10px] font-medium">Terima</span>
+            </button>
+            <button onclick="go('konversi')" data-nav="konversi"
+                class="flex-1 flex flex-col items-center justify-center gap-0.5 text-gray-400 transition-colors">
+                <div class="nav-dot"></div>
+                <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+                <span class="text-[10px] font-medium">Konversi</span>
+            </button>
+            <button onclick="go('stok')" data-nav="stok"
+                class="flex-1 flex flex-col items-center justify-center gap-0.5 text-gray-400 transition-colors">
+                <div class="nav-dot"></div>
+                <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 10V7" />
+                </svg>
+                <span class="text-[10px] font-medium">Stok</span>
+            </button>
+            <button onclick="go('setting')" data-nav="setting"
+                class="flex-1 flex flex-col items-center justify-center gap-0.5 text-gray-400 transition-colors">
+                <div class="nav-dot"></div>
+                <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span class="text-[10px] font-medium">Lainnya</span>
+            </button>
+        </div>
+    </nav>
+
+    <script>
+        // ═══════════════════════════
+        //  DATA LAYER
+        // ═══════════════════════════
+        const KEY = 'wt_v1';
+
+        const SEED = {
+            logs: [],
+            sawtimbers: [],
+            sizes: [
+                { id: 's1', code: '5×10×200', p: 200, l: 10, t: 5 },
+                { id: 's2', code: '5×15×200', p: 200, l: 15, t: 5 },
+                { id: 's3', code: '7×15×400', p: 400, l: 15, t: 7 },
+                { id: 's4', code: '3×7×300', p: 300, l: 7, t: 3 },
+            ],
+            woodTypes: ['Jati', 'Meranti', 'Merbau', 'Sengon', 'Mahoni'],
+            conversions: []
+        };
+
+        function loadDb() {
+            try { const s = localStorage.getItem(KEY); return s ? JSON.parse(s) : JSON.parse(JSON.stringify(SEED)); }
+            catch { return JSON.parse(JSON.stringify(SEED)); }
+        }
+        function saveDb() { localStorage.setItem(KEY, JSON.stringify(db)); }
+
+        let db = loadDb();
+
+        // ═══════════════════════════
+        //  UTILS
+        // ═══════════════════════════
+        const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        const today = () => new Date().toISOString().split('T')[0];
+        const fmtDate = d => new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+        const m3PerSize = id => { const s = db.sizes.find(x => x.id === id); return s ? +(s.p * s.l * s.t / 1000000).toFixed(6) : 0; };
+        const logM3Est = (size, qty) => { const d = { A1: .10, A2: .20, A3: .30, A4: .40, A5: .50 }[size] || 0; return +((Math.PI * (d / 2) ** 2 * 4 * qty).toFixed(3)); };
+
+        function toast(msg, ok = true) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.className = `fixed top-5 left-1/2 z-50 px-4 py-2 rounded-full text-xs font-semibold shadow-lg pointer-events-none toast-anim ${ok ? 'bg-gray-900 text-white' : 'bg-red-500 text-white'}`;
+            el.classList.remove('hidden');
+            setTimeout(() => el.classList.add('hidden'), 2900);
+        }
+
+        // Stock aggregators
+        function logStock() {
+            const map = {};
+            db.logs.forEach(l => {
+                const k = `${l.wt}|${l.gr}|${l.sz}`;
+                if (!map[k]) map[k] = { wt: l.wt, gr: l.gr, sz: l.sz, qty: 0, m3: 0 };
+                map[k].qty += l.qty; map[k].m3 += l.m3 || 0;
+            });
+            db.conversions.forEach(c => {
+                const k = `${c.lwt}|${c.lgr}|${c.lsz}`;
+                if (map[k]) { map[k].qty -= c.lqty; map[k].m3 -= c.lm3 || 0; }
+            });
+            return Object.values(map).filter(s => s.qty > 0);
+        }
+        function sawStock() {
+            const map = {};
+            db.sawtimbers.forEach(s => {
+                const k = `${s.wt}|${s.gr}|${s.sid}`;
+                if (!map[k]) map[k] = { wt: s.wt, gr: s.gr, sid: s.sid, qty: 0, m3: 0 };
+                map[k].qty += s.qty; map[k].m3 += s.m3 || 0;
+            });
+            return Object.values(map).filter(s => s.qty > 0);
+        }
+        const sizeLabel = id => { const s = db.sizes.find(x => x.id === id); return s ? s.code : id; };
+
+        // ═══════════════════════════
+        //  ROUTER
+        // ═══════════════════════════
+        let page = 'beranda';
+        let tabs = {};
+        let selGrade = {};   // selGrade[prefix] = grade
+        let selSz = {};     // selSz[prefix] = sizeId or sizeCode
+
+        function go(p, tab = null) {
+            page = p;
+            if (tab) tabs[p] = tab;
+            document.querySelectorAll('[data-nav]').forEach(b => {
+                const active = b.dataset.nav === p;
+                b.classList.toggle('nav-active', active);
+                b.classList.toggle('text-gray-400', !active);
+            });
+            render();
+        }
+
+        // ═══════════════════════════
+        //  RENDER DISPATCH
+        // ═══════════════════════════
+        const HDR = {
+            beranda: ['WoodTrack', 'Sistem Produksi Kayu'],
+            terima: ['Penerimaan', 'Input bahan baku masuk'],
+            konversi: ['Konversi', 'Log → Sawtimber'],
+            stok: ['Stok', 'Inventaris bahan baku'],
+            setting: ['Pengaturan', 'Kelola data master'],
+        };
+
+        function render() {
+            const [t, s] = HDR[page] || ['WoodTrack', ''];
+            document.getElementById('page-title').textContent = t;
+            document.getElementById('page-sub').textContent = s;
+            const badge = document.getElementById('hdr-badge');
+
+            // header badge
+            const ls = logStock(), ss = sawStock();
+            const lq = ls.reduce((a, b) => a + b.qty, 0), sq = ss.reduce((a, b) => a + b.qty, 0);
+            if (page === 'beranda' || page === 'stok') {
+                badge.textContent = `${lq} btg · ${sq} lbr`;
+                badge.classList.remove('hidden');
+            } else { badge.classList.add('hidden'); }
+
+            const fns = { beranda: pgBeranda, terima: pgTerima, konversi: pgKonversi, stok: pgStok, setting: pgSetting };
+            document.getElementById('main').innerHTML = `<div class="slide-up px-4 pt-3 pb-4">${(fns[page] || pgBeranda)()}</div>`;
+
+            // Re-attach grade/size visual state after render
+            restoreSelections();
+        }
+
+        function restoreSelections() {
+            ['log', 'saw', 'co'].forEach(pfx => {
+                if (selGrade[pfx]) applyGradeVis(pfx, selGrade[pfx]);
+                if (selSz[pfx]) applySzVis(pfx, selSz[pfx]);
+            });
+        }
+
+        // ═══════════════════════════
+        //  PAGE: BERANDA
+        // ═══════════════════════════
+        function pgBeranda() {
+            const ls = logStock(), ss = sawStock();
+            const lq = ls.reduce((a, b) => a + b.qty, 0), lm = ls.reduce((a, b) => a + b.m3, 0).toFixed(2);
+            const sq = ss.reduce((a, b) => a + b.qty, 0), sm = ss.reduce((a, b) => a + b.m3, 0).toFixed(4);
+
+            // recent 5 across all activity
+            const acts = [
+                ...db.logs.map(x => ({ ...x, _t: 'log' })),
+                ...db.sawtimbers.map(x => ({ ...x, _t: 'saw' })),
+                ...db.conversions.map(x => ({ ...x, _t: 'conv' })),
+            ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+
+            return `
+  <div class="space-y-4">
+    <!-- Stat cards -->
+    <div class="grid grid-cols-2 gap-3">
+      <div class="card p-4 bg-amber-50 border-amber-200">
+        <p class="section-head text-amber-700">Stok Log</p>
+        <p class="text-3xl font-bold text-amber-900">${lq}</p>
+        <p class="text-xs text-amber-600 mt-0.5">batang &nbsp;·&nbsp; ${lm} m³</p>
+        <div class="mt-2 flex gap-1 flex-wrap">
+          ${['A', 'B', 'C', 'D'].map(g => { const n = ls.filter(s => s.gr === g).reduce((a, b) => a + b.qty, 0); return n ? `<span class="grade-chip-${g} text-[10px] px-2 py-0.5 rounded-full font-semibold">${g}: ${n}</span>` : '' }).join('')}
+        </div>
+      </div>
+      <div class="card p-4 bg-green-50 border-green-200">
+        <p class="section-head text-green-700">Stok Sawtimber</p>
+        <p class="text-3xl font-bold text-green-900">${sq}</p>
+        <p class="text-xs text-green-600 mt-0.5">lembar &nbsp;·&nbsp; ${sm} m³</p>
+        <div class="mt-2 flex gap-1 flex-wrap">
+          ${['A', 'B', 'C', 'D'].map(g => { const n = ss.filter(s => s.gr === g).reduce((a, b) => a + b.qty, 0); return n ? `<span class="grade-chip-${g} text-[10px] px-2 py-0.5 rounded-full font-semibold">${g}: ${n}</span>` : '' }).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick actions -->
+    <div class="card p-4">
+      <p class="section-head">Aksi Cepat</p>
+      <div class="grid grid-cols-3 gap-2">
+        <button onclick="go('terima','log')" class="flex flex-col items-center gap-1 p-3 bg-amber-50 rounded-2xl border border-amber-100 active:scale-95 transition-transform">
+          <svg class="w-5 h-5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+          <span class="text-[11px] font-semibold text-amber-800 text-center leading-tight">Terima<br>Log</span>
+        </button>
+        <button onclick="go('terima','saw')" class="flex flex-col items-center gap-1 p-3 bg-green-50 rounded-2xl border border-green-100 active:scale-95 transition-transform">
+          <svg class="w-5 h-5 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+          <span class="text-[11px] font-semibold text-green-800 text-center leading-tight">Terima<br>Sawtimber</span>
+        </button>
+        <button onclick="go('konversi')" class="flex flex-col items-center gap-1 p-3 bg-blue-50 rounded-2xl border border-blue-100 active:scale-95 transition-transform">
+          <svg class="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+          <span class="text-[11px] font-semibold text-blue-800 text-center leading-tight">Konversi<br>Log</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Recent activity -->
+    <div class="card p-4">
+      <p class="section-head">Aktivitas Terakhir</p>
+      ${acts.length === 0 ? `<div class="text-center py-8"><p class="text-sm text-gray-400">Belum ada aktivitas</p><p class="text-xs text-gray-300 mt-1">Mulai terima bahan baku</p></div>` : `
+      <div class="space-y-0 divide-y divide-gray-50">
+        ${acts.map(a => {
+                if (a._t === 'log') return `<div class="flex items-center justify-between py-3"><div class="flex items-center gap-2.5"><div class="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0"></div><div><p class="text-xs font-semibold">Log · ${a.wt}</p><p class="text-[11px] text-gray-400">Grade ${a.gr} · ${a.sz} · ${fmtDate(a.date)}</p></div></div><span class="text-xs font-bold text-amber-700">${a.qty} btg</span></div>`;
+                if (a._t === 'saw') return `<div class="flex items-center justify-between py-3"><div class="flex items-center gap-2.5"><div class="w-2 h-2 rounded-full bg-green-400 flex-shrink-0"></div><div><p class="text-xs font-semibold">Sawtimber · ${a.wt}</p><p class="text-[11px] text-gray-400">Grade ${a.gr} · ${sizeLabel(a.sid)} · ${fmtDate(a.date)}</p></div></div><span class="text-xs font-bold text-green-700">${a.qty} lbr</span></div>`;
+                return `<div class="flex items-center justify-between py-3"><div class="flex items-center gap-2.5"><div class="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0"></div><div><p class="text-xs font-semibold">Konversi · ${a.lwt}</p><p class="text-[11px] text-gray-400">${a.lqty} btg → ${a.oqty} lbr · ${fmtDate(a.date)}</p></div></div><span class="text-xs font-bold text-blue-700">konversi</span></div>`;
+            }).join('')}
+      </div>`}
+    </div>
+  </div>`;
+        }
+
+        // ═══════════════════════════
+        //  PAGE: TERIMA
+        // ═══════════════════════════
+        function pgTerima() {
+            const t = tabs.terima || 'log';
+            return `
+  <div class="flex -mx-4 px-4 border-b border-gray-100 mb-5 bg-white sticky top-14 z-10">
+    <button onclick="go('terima','log')" class="tab-line flex-1 pb-3 pt-2 text-sm text-gray-400 ${t === 'log' ? 'active' : ''}">Log</button>
+    <button onclick="go('terima','saw')" class="tab-line flex-1 pb-3 pt-2 text-sm text-gray-400 ${t === 'saw' ? 'active' : ''}">Sawtimber</button>
+  </div>
+  ${t === 'log' ? frmLog() : frmSaw()}`;
+        }
+
+        function frmLog() {
+            return `
+  <form onsubmit="submitLog(event)" class="space-y-5">
+    ${fldDate('ld-date')}
+    ${fldWoodType('ld-wt')}
+    ${fldGrade('log')}
+    <div>
+      <p class="text-xs font-semibold text-gray-600 mb-2">Wood Size <span class="font-normal text-gray-400">(diameter batang)</span></p>
+      <div class="grid grid-cols-5 gap-1.5">
+        ${['A1', 'A2', 'A3', 'A4', 'A5'].map((s, i) => `
+        <button type="button" onclick="pickSz('log','${s}')" data-sz="${s}" class="size-btn size-btn-log">
+          <div class="text-xs font-bold">${s}</div>
+          <div class="text-[9px] text-gray-400 mt-0.5">${(i + 1) * 10}cm</div>
+        </button>`).join('')}
+      </div>
+      <input type="hidden" id="log-sz">
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="text-xs font-semibold text-gray-600 block mb-2">Jumlah Batang</label>
+        <input type="number" id="ld-qty" placeholder="0" min="1" class="field">
+      </div>
+      <div>
+        <label class="text-xs font-semibold text-gray-600 block mb-2">M³ <span class="text-gray-400 font-normal">(opsional)</span></label>
+        <input type="number" id="ld-m3" placeholder="estimasi otomatis" step="0.001" class="field">
+      </div>
+    </div>
+    <div>
+      <label class="text-xs font-semibold text-gray-600 block mb-2">Catatan <span class="text-gray-400 font-normal">(opsional)</span></label>
+      <textarea id="ld-notes" rows="2" placeholder="Catatan tambahan..." class="field resize-none"></textarea>
+    </div>
+    <button type="submit" class="w-full bg-amber-800 text-white rounded-2xl py-4 text-sm font-semibold active:scale-95 transition-transform shadow-sm">
+      Simpan Penerimaan Log
+    </button>
+  </form>
+  <style>.field{width:100%;border:1.5px solid #e5e7eb;border-radius:12px;padding:12px 14px;font-size:13px;font-family:Poppins,sans-serif;outline:none;transition:border-color .15s}.field:focus{border-color:#92400e;box-shadow:0 0 0 3px rgba(120,53,15,.08)}</style>`;
+        }
+
+        function frmSaw() {
+            const sizes = db.sizes;
+            return `
+  <form onsubmit="submitSaw(event)" class="space-y-5">
+    ${fldDate('sd-date')}
+    ${fldWoodType('sd-wt')}
+    ${fldGrade('saw')}
+    <div>
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-xs font-semibold text-gray-600">Ukuran Sawtimber</p>
+        <button type="button" onclick="openSzModal()" class="text-xs text-green-700 font-semibold">+ Tambah Ukuran</button>
+      </div>
+      ${sizes.length === 0 ? `<div class="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center"><p class="text-xs text-gray-400">Belum ada ukuran standar</p><button type="button" onclick="openSzModal()" class="text-xs text-green-700 font-semibold mt-1">Tambah ukuran</button></div>` : `
+      <div class="grid grid-cols-2 gap-2">
+        ${sizes.map(sz => `
+        <button type="button" onclick="pickSzSaw('${sz.id}')" data-sid="${sz.id}" class="saw-sz-btn text-left border-2 border-gray-200 rounded-xl p-3 bg-gray-50 transition-all active:scale-95">
+          <p class="text-xs font-bold text-gray-800">${sz.code}</p>
+          <p class="text-[10px] text-gray-400 mt-0.5">${sz.p} × ${sz.l} × ${sz.t} cm</p>
+          <p class="text-[10px] text-green-600 mt-0.5">${+(sz.p * sz.l * sz.t / 1000000).toFixed(4)} m³/pcs</p>
+        </button>`).join('')}
+      </div>`}
+      <input type="hidden" id="saw-sz">
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="text-xs font-semibold text-gray-600 block mb-2">Jumlah (lembar)</label>
+        <input type="number" id="sd-qty" placeholder="0" min="1" oninput="autoM3Saw()" class="field">
+      </div>
+      <div>
+        <label class="text-xs font-semibold text-gray-600 block mb-2">M³ <span class="text-gray-400 font-normal">(opsional)</span></label>
+        <input type="number" id="sd-m3" placeholder="estimasi otomatis" step="0.0001" class="field">
+      </div>
+    </div>
+    <button type="submit" class="w-full bg-green-800 text-white rounded-2xl py-4 text-sm font-semibold active:scale-95 transition-transform shadow-sm">
+      Simpan Penerimaan Sawtimber
+    </button>
+  </form>
+  <style>.field{width:100%;border:1.5px solid #e5e7eb;border-radius:12px;padding:12px 14px;font-size:13px;font-family:Poppins,sans-serif;outline:none;transition:border-color .15s}.field:focus{border-color:#15803d;box-shadow:0 0 0 3px rgba(21,128,61,.08)}</style>
+  ${modalSzForm()}`;
+        }
+
+        // ═══════════════════════════
+        //  PAGE: KONVERSI
+        // ═══════════════════════════
+        function pgKonversi() {
+            const ls = logStock();
+            if (ls.length === 0) return `
+  <div class="flex flex-col items-center justify-center py-24 text-center">
+    <div class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
+      <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 10V7"/></svg>
+    </div>
+    <p class="text-sm font-semibold text-gray-500">Tidak ada stok log</p>
+    <p class="text-xs text-gray-400 mt-1">Terima log terlebih dahulu sebelum konversi</p>
+    <button onclick="go('terima','log')" class="mt-5 bg-amber-800 text-white px-6 py-3 rounded-xl text-sm font-semibold active:scale-95">Terima Log</button>
+  </div>`;
+
+            return `
+  <form onsubmit="submitKonv(event)" class="space-y-5">
+    <div class="bg-blue-50 border border-blue-100 rounded-xl p-3">
+      <p class="text-xs text-blue-700">Catat proses konversi log menjadi sawtimber. Stok log akan berkurang sesuai input.</p>
+    </div>
+    ${fldDate('kv-date')}
+    <!-- Log Input -->
+    <div>
+      <p class="text-xs font-semibold text-gray-600 mb-2">Stok Log yang Diproses</p>
+      <select id="kv-log" class="field bg-white" onchange="fillKvWt()">
+        <option value="">-- Pilih stok log --</option>
+        ${ls.map((s, i) => `<option value="${i}">${s.wt} · Grade ${s.gr} · ${s.sz} · (${s.qty} batang tersedia)</option>`).join('')}
+      </select>
+    </div>
+    <div>
+      <label class="text-xs font-semibold text-gray-600 block mb-2">Jumlah Log Dipakai (batang)</label>
+      <input type="number" id="kv-lqty" placeholder="0" min="1" class="field">
+    </div>
+    <div class="border-t border-dashed border-gray-200 pt-1">
+      <p class="section-head mt-3">Output Sawtimber</p>
+    </div>
+    <div>
+      <label class="text-xs font-semibold text-gray-600 block mb-2">Jenis Kayu Output</label>
+      <input type="text" id="kv-owt" placeholder="Ikuti log jika dikosongkan" list="kv-wt-list" class="field">
+      <datalist id="kv-wt-list">${db.woodTypes.map(w => `<option value="${w}">`).join('')}</datalist>
+    </div>
+    ${fldGrade('co')}
+    <div>
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-xs font-semibold text-gray-600">Ukuran Sawtimber Output</p>
+        <button type="button" onclick="go('setting','ukuran')" class="text-xs text-blue-600 font-semibold">Kelola Ukuran</button>
+      </div>
+      ${db.sizes.length === 0 ? `<p class="text-xs text-gray-400 border border-dashed border-gray-200 rounded-xl p-3 text-center">Tambahkan ukuran standar di menu Pengaturan</p>` : `
+      <div class="grid grid-cols-2 gap-2">
+        ${db.sizes.map(sz => `
+        <button type="button" onclick="pickSzCo('${sz.id}')" data-sid="${sz.id}" class="co-sz-btn text-left border-2 border-gray-200 rounded-xl p-3 bg-gray-50 transition-all active:scale-95">
+          <p class="text-xs font-bold text-gray-800">${sz.code}</p>
+          <p class="text-[10px] text-gray-400">${sz.p}×${sz.l}×${sz.t} cm</p>
+        </button>`).join('')}
+      </div>`}
+      <input type="hidden" id="co-sz">
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="text-xs font-semibold text-gray-600 block mb-2">Jumlah Output (lembar)</label>
+        <input type="number" id="kv-oqty" placeholder="0" min="1" class="field">
+      </div>
+      <div>
+        <label class="text-xs font-semibold text-gray-600 block mb-2">M³ Output <span class="text-gray-400 font-normal">(opsional)</span></label>
+        <input type="number" id="kv-om3" placeholder="auto" step="0.0001" class="field">
+      </div>
+    </div>
+    <button type="submit" class="w-full bg-blue-800 text-white rounded-2xl py-4 text-sm font-semibold active:scale-95 transition-transform shadow-sm">
+      Simpan Konversi
+    </button>
+  </form>
+  <style>.field{width:100%;border:1.5px solid #e5e7eb;border-radius:12px;padding:12px 14px;font-size:13px;font-family:Poppins,sans-serif;outline:none;transition:border-color .15s}.field:focus{border-color:#1d4ed8;box-shadow:0 0 0 3px rgba(29,78,216,.08)}</style>`;
+        }
+
+        // ═══════════════════════════
+        //  PAGE: STOK
+        // ═══════════════════════════
+        function pgStok() {
+            const t = tabs.stok || 'log';
+            const ls = logStock(), ss = sawStock();
+            return `
+  <div class="flex -mx-4 px-4 border-b border-gray-100 mb-5 bg-white sticky top-14 z-10">
+    <button onclick="go('stok','log')" class="tab-line flex-1 pb-3 pt-2 text-sm text-gray-400 ${t === 'log' ? 'active' : ''}">
+      Log ${ls.length ? `<span class="text-[10px] bg-amber-100 text-amber-700 rounded-full px-1.5 py-0.5 font-semibold">${ls.reduce((a, b) => a + b.qty, 0)}</span>` : ''}
+    </button>
+    <button onclick="go('stok','saw')" class="tab-line flex-1 pb-3 pt-2 text-sm text-gray-400 ${t === 'saw' ? 'active' : ''}">
+      Sawtimber ${ss.length ? `<span class="text-[10px] bg-green-100 text-green-700 rounded-full px-1.5 py-0.5 font-semibold">${ss.reduce((a, b) => a + b.qty, 0)}</span>` : ''}
+    </button>
+  </div>
+  ${t === 'log' ? renderLogStok(ls) : renderSawStok(ss)}`;
+        }
+
+        function renderLogStok(stock) {
+            if (!stock.length) return `<div class="text-center py-20"><p class="text-sm text-gray-400">Stok log kosong</p><button onclick="go('terima','log')" class="mt-3 text-sm text-amber-700 font-semibold">+ Terima Log</button></div>`;
+            const grouped = {};
+            stock.forEach(s => { if (!grouped[s.wt]) grouped[s.wt] = []; grouped[s.wt].push(s); });
+            return `<div class="space-y-3">
+  ${Object.entries(grouped).map(([wt, items]) => `
+  <div class="card overflow-hidden">
+    <div class="bg-amber-50 px-4 py-2.5 border-b border-amber-100 flex items-center justify-between">
+      <p class="text-xs font-bold text-amber-900">${wt}</p>
+      <p class="text-xs text-amber-600">${items.reduce((a, b) => a + b.qty, 0)} batang total</p>
+    </div>
+    <div class="divide-y divide-gray-50">
+      ${items.map(it => `
+      <div class="flex items-center justify-between px-4 py-3">
+        <div class="flex items-center gap-3">
+          <span class="grade-chip-${it.gr} text-[11px] font-bold px-2 py-1 rounded-lg">${it.gr}</span>
+          <div>
+            <p class="text-sm font-semibold">${it.sz}</p>
+            <p class="text-[11px] text-gray-400">${it.m3.toFixed(3)} m³</p>
+          </div>
+        </div>
+        <div class="text-right">
+          <p class="text-lg font-bold text-amber-700">${it.qty}</p>
+          <p class="text-[11px] text-gray-400">batang</p>
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>`).join('')}
+  </div>`;
+        }
+
+        function renderSawStok(stock) {
+            if (!stock.length) return `<div class="text-center py-20"><p class="text-sm text-gray-400">Stok sawtimber kosong</p><button onclick="go('terima','saw')" class="mt-3 text-sm text-green-700 font-semibold">+ Terima Sawtimber</button></div>`;
+            const grouped = {};
+            stock.forEach(s => { if (!grouped[s.wt]) grouped[s.wt] = []; grouped[s.wt].push(s); });
+            return `<div class="space-y-3">
+  ${Object.entries(grouped).map(([wt, items]) => `
+  <div class="card overflow-hidden">
+    <div class="bg-green-50 px-4 py-2.5 border-b border-green-100 flex items-center justify-between">
+      <p class="text-xs font-bold text-green-900">${wt}</p>
+      <p class="text-xs text-green-600">${items.reduce((a, b) => a + b.qty, 0)} lembar total</p>
+    </div>
+    <div class="divide-y divide-gray-50">
+      ${items.map(it => `
+      <div class="flex items-center justify-between px-4 py-3">
+        <div class="flex items-center gap-3">
+          <span class="grade-chip-${it.gr} text-[11px] font-bold px-2 py-1 rounded-lg">${it.gr}</span>
+          <div>
+            <p class="text-sm font-semibold">${sizeLabel(it.sid)}</p>
+            <p class="text-[11px] text-gray-400">${it.m3.toFixed(4)} m³</p>
+          </div>
+        </div>
+        <div class="text-right">
+          <p class="text-lg font-bold text-green-700">${it.qty}</p>
+          <p class="text-[11px] text-gray-400">lembar</p>
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>`).join('')}
+  </div>`;
+        }
+
+        // ═══════════════════════════
+        //  PAGE: SETTING
+        // ═══════════════════════════
+        function pgSetting() {
+            const t = tabs.setting || 'ukuran';
+            return `
+  <div class="flex -mx-4 px-4 border-b border-gray-100 mb-5 bg-white sticky top-14 z-10">
+    <button onclick="go('setting','ukuran')" class="tab-line flex-1 pb-3 pt-2 text-[12px] text-gray-400 ${t === 'ukuran' ? 'active' : ''}">Ukuran</button>
+    <button onclick="go('setting','jenis')" class="tab-line flex-1 pb-3 pt-2 text-[12px] text-gray-400 ${t === 'jenis' ? 'active' : ''}">Jenis Kayu</button>
+    <button onclick="go('setting','riwayat')" class="tab-line flex-1 pb-3 pt-2 text-[12px] text-gray-400 ${t === 'riwayat' ? 'active' : ''}">Riwayat</button>
+  </div>
+  ${t === 'ukuran' ? pgUkuran() : t === 'jenis' ? pgJenis() : pgRiwayat()}`;
+        }
+
+        function pgUkuran() {
+            return `
+  <div class="space-y-3">
+    <button onclick="openSzModal(true)" class="w-full border-2 border-dashed border-gray-200 rounded-2xl py-4 text-sm text-gray-400 font-semibold active:scale-95 transition-transform">
+      + Tambah Ukuran Standar
+    </button>
+    ${db.sizes.length === 0 ? `<p class="text-center text-sm text-gray-400 py-10">Belum ada ukuran standar</p>` : `
+    <div class="space-y-2">
+      ${db.sizes.map(sz => `
+      <div class="card flex items-center justify-between px-4 py-3">
+        <div>
+          <p class="text-sm font-bold">${sz.code}</p>
+          <p class="text-xs text-gray-400">${sz.p} × ${sz.l} × ${sz.t} cm</p>
+          <p class="text-xs text-green-600">${+(sz.p * sz.l * sz.t / 1000000).toFixed(4)} m³/pcs</p>
+        </div>
+        <button onclick="delSz('${sz.id}')" class="w-8 h-8 flex items-center justify-center text-red-400 active:scale-90">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        </button>
+      </div>`).join('')}
+    </div>`}
+  </div>
+  ${modalSzForm(true)}`;
+        }
+
+        function pgJenis() {
+            return `
+  <div class="space-y-4">
+    <div class="flex gap-2">
+      <input type="text" id="new-wt" placeholder="Nama jenis kayu..." class="flex-1 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-amber-600" style="font-family:Poppins,sans-serif">
+      <button onclick="addWt()" class="bg-amber-800 text-white px-4 py-3 rounded-xl text-sm font-semibold active:scale-95">Tambah</button>
+    </div>
+    <div class="space-y-2">
+      ${db.woodTypes.map((w, i) => `
+      <div class="card flex items-center justify-between px-4 py-3">
+        <span class="text-sm font-medium">${w}</span>
+        <button onclick="delWt(${i})" class="w-7 h-7 flex items-center justify-center text-red-400 active:scale-90">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>`).join('')}
+    </div>
+    <button onclick="if(confirm('Reset semua data? Tindakan ini tidak bisa dibatalkan.')){localStorage.removeItem('wt_v1');db=JSON.parse(JSON.stringify(SEED));selGrade={};selSz={};go('beranda');toast('Data direset')}" class="w-full border border-red-200 text-red-500 rounded-xl py-3 text-xs font-semibold mt-4 active:scale-95">
+      Reset Semua Data
+    </button>
+  </div>`;
+        }
+
+        function pgRiwayat() {
+            const all = [
+                ...db.logs.map(x => ({ ...x, _t: 'log', _d: new Date(x.date) })),
+                ...db.sawtimbers.map(x => ({ ...x, _t: 'saw', _d: new Date(x.date) })),
+                ...db.conversions.map(x => ({ ...x, _t: 'conv', _d: new Date(x.date) })),
+            ].sort((a, b) => b._d - a._d);
+            if (!all.length) return `<div class="text-center py-20"><p class="text-sm text-gray-400">Belum ada riwayat transaksi</p></div>`;
+            const dot = { 'log': 'bg-amber-400', 'saw': 'bg-green-400', 'conv': 'bg-blue-400' };
+            return `<div class="space-y-1.5">
+  ${all.slice(0, 50).map(a => {
+                if (a._t === 'log') return `<div class="card flex items-center gap-3 px-4 py-3"><div class="w-2 h-2 rounded-full ${dot.log} flex-shrink-0"></div><div class="flex-1 min-w-0"><div class="flex justify-between items-start"><p class="text-xs font-semibold truncate">Terima Log · ${a.wt}</p><span class="text-xs font-bold text-amber-700 ml-2 flex-shrink-0">${a.qty} btg</span></div><p class="text-[11px] text-gray-400">Grade ${a.gr} · ${a.sz} · ${fmtDate(a.date)}</p></div></div>`;
+                if (a._t === 'saw') return `<div class="card flex items-center gap-3 px-4 py-3"><div class="w-2 h-2 rounded-full ${dot.saw} flex-shrink-0"></div><div class="flex-1 min-w-0"><div class="flex justify-between items-start"><p class="text-xs font-semibold truncate">Terima Sawtimber · ${a.wt}</p><span class="text-xs font-bold text-green-700 ml-2 flex-shrink-0">${a.qty} lbr</span></div><p class="text-[11px] text-gray-400">Grade ${a.gr} · ${sizeLabel(a.sid)} · ${fmtDate(a.date)}</p></div></div>`;
+                return `<div class="card flex items-center gap-3 px-4 py-3"><div class="w-2 h-2 rounded-full ${dot.conv} flex-shrink-0"></div><div class="flex-1 min-w-0"><div class="flex justify-between items-start"><p class="text-xs font-semibold truncate">Konversi · ${a.lwt}</p><span class="text-xs font-bold text-blue-700 ml-2 flex-shrink-0">${a.lqty}→${a.oqty}</span></div><p class="text-[11px] text-gray-400">Grade ${a.lgr} · ${a.lsz} · ${fmtDate(a.date)}</p></div></div>`;
+            }).join('')}</div>`;
+        }
+
+        // ═══════════════════════════
+        //  SHARED FIELD COMPONENTS
+        // ═══════════════════════════
+        function fldDate(id) {
+            return `<div><label class="text-xs font-semibold text-gray-600 block mb-2">Tanggal Terima</label>
+  <input type="date" id="${id}" value="${today()}" class="field w-full"></div>`;
+        }
+        function fldWoodType(id) {
+            const lid = id + '-dl';
+            return `<div><label class="text-xs font-semibold text-gray-600 block mb-2">Jenis Kayu</label>
+  <input type="text" id="${id}" placeholder="cth: Jati, Meranti…" list="${lid}" class="field w-full">
+  <datalist id="${lid}">${db.woodTypes.map(w => `<option value="${w}">`).join('')}</datalist></div>`;
+        }
+        function fldGrade(pfx) {
+            const glabel = { A: 'Tinggi', B: 'Sedang', C: 'Rendah', D: 'Ditolak' };
+            return `<div><p class="text-xs font-semibold text-gray-600 mb-2">Grade Kualitas</p>
+  <div class="grid grid-cols-4 gap-2">
+    ${['A', 'B', 'C', 'D'].map(g => `<button type="button" onclick="pickGrade('${pfx}','${g}')" data-gr="${g}" class="grade-btn grade-btn-${g} gbtn-${pfx}">
+      <div class="text-base font-bold">${g}</div>
+      <div class="text-[10px] mt-0.5">${glabel[g]}</div>
+    </button>`).join('')}
+  </div>
+  <input type="hidden" id="${pfx}-gr"></div>`;
+        }
+
+        function modalSzForm(settings = false) {
+            const mid = settings ? 'modal-sz-s' : 'modal-sz';
+            const saveF = settings ? 'saveSzSettings()' : 'saveSzInline()';
+            const closeF = `document.getElementById('${mid}').classList.add('hidden')`;
+            return `
+  <div id="${mid}" class="modal-sheet hidden">
+    <div class="sheet-body space-y-4">
+      <div class="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-1"></div>
+      <h3 class="text-sm font-bold">Tambah Ukuran Standar Sawtimber</h3>
+      <div>
+        <label class="text-xs font-semibold text-gray-600 block mb-2">Kode/Nama Ukuran</label>
+        <input type="text" id="${mid}-code" placeholder="cth: 5×10×200" class="field-m w-full" style="font-family:Poppins,sans-serif;border:1.5px solid #e5e7eb;border-radius:12px;padding:12px 14px;font-size:13px;outline:none">
+      </div>
+      <div class="grid grid-cols-3 gap-2">
+        <div><label class="text-xs font-semibold text-gray-600 block mb-2">Panjang (cm)</label>
+        <input type="number" id="${mid}-p" placeholder="200" oninput="previewSzM3('${mid}')" class="field-m w-full" style="font-family:Poppins,sans-serif;border:1.5px solid #e5e7eb;border-radius:12px;padding:12px 10px;font-size:13px;outline:none"></div>
+        <div><label class="text-xs font-semibold text-gray-600 block mb-2">Lebar (cm)</label>
+        <input type="number" id="${mid}-l" placeholder="10" oninput="previewSzM3('${mid}')" class="field-m w-full" style="font-family:Poppins,sans-serif;border:1.5px solid #e5e7eb;border-radius:12px;padding:12px 10px;font-size:13px;outline:none"></div>
+        <div><label class="text-xs font-semibold text-gray-600 block mb-2">Tebal (cm)</label>
+        <input type="number" id="${mid}-t" placeholder="5" oninput="previewSzM3('${mid}')" class="field-m w-full" style="font-family:Poppins,sans-serif;border:1.5px solid #e5e7eb;border-radius:12px;padding:12px 10px;font-size:13px;outline:none"></div>
+      </div>
+      <div id="${mid}-prev" class="hidden bg-green-50 border border-green-200 rounded-xl p-3">
+        <p class="text-xs text-green-700"><span class="font-semibold">Volume per pcs:</span> <span id="${mid}-pv">-</span> m³</p>
+      </div>
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <button type="button" onclick="${closeF}" class="border border-gray-200 rounded-xl py-3 text-sm font-semibold text-gray-500 active:scale-95">Batal</button>
+        <button type="button" onclick="${saveF}" class="bg-green-800 text-white rounded-xl py-3 text-sm font-semibold active:scale-95">Simpan</button>
+      </div>
+    </div>
+  </div>`;
+        }
+
+        // ═══════════════════════════
+        //  INTERACTION HANDLERS
+        // ═══════════════════════════
+        function pickGrade(pfx, g) {
+            selGrade[pfx] = g;
+            applyGradeVis(pfx, g);
+            const inp = document.getElementById(`${pfx}-gr`);
+            if (inp) inp.value = g;
+        }
+        function applyGradeVis(pfx, g) {
+            document.querySelectorAll(`.gbtn-${pfx}`).forEach(b => {
+                b.classList.toggle('sel', b.dataset.gr === g);
+            });
+        }
+
+        function pickSz(pfx, sz) {
+            selSz[pfx] = sz;
+            document.querySelectorAll(`.size-btn-${pfx}`).forEach(b => {
+                b.classList.toggle('sel', b.dataset.sz === sz);
+            });
+            const inp = document.getElementById(`${pfx}-sz`);
+            if (inp) inp.value = sz;
+        }
+
+        function pickSzSaw(sid) {
+            selSz['saw'] = sid;
+            document.querySelectorAll('.saw-sz-btn').forEach(b => {
+                b.classList.toggle('saw-sel', b.dataset.sid === sid);
+            });
+            document.getElementById('saw-sz').value = sid;
+            autoM3Saw();
+        }
+        function applySzVis(pfx, val) {
+            if (pfx === 'saw') { document.querySelectorAll('.saw-sz-btn').forEach(b => b.classList.toggle('saw-sel', b.dataset.sid === val)); }
+            if (pfx === 'co') { document.querySelectorAll('.co-sz-btn').forEach(b => b.classList.toggle('saw-sel-blue', b.dataset.sid === val)); }
+            if (pfx === 'log') { document.querySelectorAll('.size-btn-log').forEach(b => b.classList.toggle('sel', b.dataset.sz === val)); }
+        }
+
+        function pickSzCo(sid) {
+            selSz['co'] = sid;
+            document.querySelectorAll('.co-sz-btn').forEach(b => {
+                b.classList.toggle('saw-sel-blue', b.dataset.sid === sid);
+            });
+            document.getElementById('co-sz').value = sid;
+        }
+
+        function autoM3Saw() {
+            const sid = document.getElementById('saw-sz')?.value;
+            const qty = parseInt(document.getElementById('sd-qty')?.value || 0);
+            const m3inp = document.getElementById('sd-m3');
+            if (sid && qty > 0 && m3inp && !m3inp._manual) {
+                m3inp.value = +(m3PerSize(sid) * qty).toFixed(4);
+            }
+        }
+
+        function fillKvWt() {
+            const idx = document.getElementById('kv-log')?.value;
+            if (idx === '') return;
+            const ls = logStock();
+            const s = ls[parseInt(idx)];
+            if (s) { const inp = document.getElementById('kv-owt'); if (inp && !inp.value) inp.value = s.wt; }
+        }
+
+        function openSzModal(settings = false) {
+            const mid = settings ? 'modal-sz-s' : 'modal-sz';
+            const el = document.getElementById(mid);
+            if (el) el.classList.remove('hidden');
+        }
+
+        function previewSzM3(mid) {
+            const p = parseFloat(document.getElementById(`${mid}-p`)?.value || 0);
+            const l = parseFloat(document.getElementById(`${mid}-l`)?.value || 0);
+            const t = parseFloat(document.getElementById(`${mid}-t`)?.value || 0);
+            const prev = document.getElementById(`${mid}-prev`);
+            const pv = document.getElementById(`${mid}-pv`);
+            if (p > 0 && l > 0 && t > 0 && prev && pv) {
+                prev.classList.remove('hidden');
+                pv.textContent = +(p * l * t / 1000000).toFixed(6);
+            }
+        }
+
+        function saveSzInline() { _saveSz('modal-sz', () => render()); }
+        function saveSzSettings() { _saveSz('modal-sz-s', () => render()); }
+        function _saveSz(mid, cb) {
+            const code = document.getElementById(`${mid}-code`)?.value.trim();
+            const p = parseFloat(document.getElementById(`${mid}-p`)?.value);
+            const l = parseFloat(document.getElementById(`${mid}-l`)?.value);
+            const t = parseFloat(document.getElementById(`${mid}-t`)?.value);
+            if (!code || !p || !l || !t) { toast('Lengkapi semua data ukuran', false); return; }
+            db.sizes.push({ id: uid(), code, p, l, t });
+            saveDb();
+            document.getElementById(mid).classList.add('hidden');
+            toast('Ukuran berhasil ditambahkan');
+            cb();
+        }
+
+        function delSz(id) {
+            if (!confirm('Hapus ukuran ini?')) return;
+            db.sizes = db.sizes.filter(s => s.id !== id);
+            saveDb(); render(); toast('Ukuran dihapus');
+        }
+
+        function addWt() {
+            const inp = document.getElementById('new-wt');
+            const v = inp?.value.trim();
+            if (!v) return;
+            if (db.woodTypes.includes(v)) { toast('Jenis kayu sudah ada', false); return; }
+            db.woodTypes.push(v); saveDb(); inp.value = ''; render(); toast('Jenis kayu ditambahkan');
+        }
+        function delWt(i) { db.woodTypes.splice(i, 1); saveDb(); render(); }
+
+        // ═══════════════════════════
+        //  SUBMIT HANDLERS
+        // ═══════════════════════════
+        function submitLog(e) {
+            e.preventDefault();
+            const date = document.getElementById('ld-date').value;
+            const wt = document.getElementById('ld-wt').value.trim();
+            const gr = document.getElementById('log-gr').value;
+            const sz = document.getElementById('log-sz').value;
+            const qty = parseInt(document.getElementById('ld-qty').value);
+            const m3v = document.getElementById('ld-m3').value;
+            const notes = document.getElementById('ld-notes').value;
+
+            if (!wt) { toast('Isi jenis kayu terlebih dahulu', false); return; }
+            if (!gr) { toast('Pilih grade kualitas', false); return; }
+            if (!sz) { toast('Pilih ukuran log (A1-A5)', false); return; }
+            if (!qty || qty < 1) { toast('Isi jumlah batang', false); return; }
+
+            const m3 = m3v ? parseFloat(m3v) : logM3Est(sz, qty);
+            db.logs.push({ id: uid(), date, wt, gr, sz, qty, m3, notes, src: 'received' });
+            if (!db.woodTypes.includes(wt)) db.woodTypes.push(wt);
+            saveDb();
+            selGrade.log = null; selSz.log = null;
+            toast(`Log ${wt} Grade ${gr} · ${qty} batang tersimpan`);
+            go('terima', 'log');
+        }
+
+        function submitSaw(e) {
+            e.preventDefault();
+            const date = document.getElementById('sd-date').value;
+            const wt = document.getElementById('sd-wt').value.trim();
+            const gr = document.getElementById('saw-gr').value;
+            const sid = document.getElementById('saw-sz').value;
+            const qty = parseInt(document.getElementById('sd-qty').value);
+            const m3v = document.getElementById('sd-m3').value;
+
+            if (!wt) { toast('Isi jenis kayu terlebih dahulu', false); return; }
+            if (!gr) { toast('Pilih grade kualitas', false); return; }
+            if (!sid) { toast('Pilih ukuran sawtimber', false); return; }
+            if (!qty || qty < 1) { toast('Isi jumlah lembar', false); return; }
+
+            const m3 = m3v ? parseFloat(m3v) : +(m3PerSize(sid) * qty).toFixed(4);
+            db.sawtimbers.push({ id: uid(), date, wt, gr, sid, qty, m3, src: 'received' });
+            if (!db.woodTypes.includes(wt)) db.woodTypes.push(wt);
+            saveDb();
+            selGrade.saw = null; selSz.saw = null;
+            toast(`Sawtimber ${wt} Grade ${gr} · ${qty} lembar tersimpan`);
+            go('terima', 'saw');
+        }
+
+        function submitKonv(e) {
+            e.preventDefault();
+            const date = document.getElementById('kv-date').value;
+            const logIdx = document.getElementById('kv-log').value;
+            const lqty = parseInt(document.getElementById('kv-lqty').value);
+            const owt = document.getElementById('kv-owt').value.trim();
+            const ogr = document.getElementById('co-gr').value;
+            const osid = document.getElementById('co-sz').value;
+            const oqty = parseInt(document.getElementById('kv-oqty').value);
+            const om3v = document.getElementById('kv-om3').value;
+
+            if (logIdx === '') { toast('Pilih stok log yang akan diproses', false); return; }
+            if (!lqty || lqty < 1) { toast('Isi jumlah log yang dipakai', false); return; }
+            if (!ogr) { toast('Pilih grade output', false); return; }
+            if (!osid) { toast('Pilih ukuran sawtimber output', false); return; }
+            if (!oqty || oqty < 1) { toast('Isi jumlah output sawtimber', false); return; }
+
+            const ls = logStock();
+            const src = ls[parseInt(logIdx)];
+            if (!src) { toast('Stok log tidak ditemukan', false); return; }
+            if (lqty > src.qty) { toast(`Stok tidak cukup (tersedia: ${src.qty} batang)`, false); return; }
+
+            const lm3 = src.qty > 0 ? +(src.m3 / src.qty * lqty).toFixed(3) : 0;
+            const finalWt = owt || src.wt;
+            const om3 = om3v ? parseFloat(om3v) : +(m3PerSize(osid) * oqty).toFixed(4);
+
+            db.conversions.push({ id: uid(), date, lwt: src.wt, lgr: src.gr, lsz: src.sz, lqty, lm3, owt: finalWt, ogr, osid, oqty, om3 });
+            db.sawtimbers.push({ id: uid(), date, wt: finalWt, gr: ogr, sid: osid, qty: oqty, m3: om3, src: 'converted' });
+            saveDb();
+            selGrade.co = null; selSz.co = null;
+            toast(`Konversi berhasil: ${lqty} batang → ${oqty} lembar sawtimber`);
+            go('stok', 'saw');
+        }
+
+        // ═══════════════════════════
+        //  BOOT
+        // ═══════════════════════════
+        go('beranda');
+    </script>
+</body>
+
+</html>
