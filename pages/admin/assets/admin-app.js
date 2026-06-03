@@ -14,6 +14,7 @@ const SEED = {
   ],
   woodTypes:['Jati','Meranti','Merbau','Sengon','Mahoni','Kamper'],
   conversions:[],
+  crosscuts:[],
   products:[
     {id:'p1',name:'Pintu Panel',cat:'Pintu',desc:'Konstruksi panel solid dengan frame kayu'},
     {id:'p2',name:'Pintu Flush',cat:'Pintu',desc:'Permukaan rata dengan isian honeycomb/solid'},
@@ -38,6 +39,8 @@ function saveDb(){localStorage.setItem(KEY,JSON.stringify(db))}
 
 let db=loadDb();
 db.sales=db.sales||[];
+db.crosscuts=db.crosscuts||[];
+db.kacas=db.kacas||[];
 
 // ═══════════════════════════════════
 //  UTILS
@@ -259,8 +262,52 @@ function pgPenerimaan(){
   <div style="display:flex;gap:24px;border-bottom:1px solid #e2e8f0;margin-bottom:28px">
     <button class="tab-btn ${t==='log'?'active':''}" onclick="go('penerimaan','log')">Penerimaan Log</button>
     <button class="tab-btn ${t==='saw'?'active':''}" onclick="go('penerimaan','saw')">Penerimaan Sawtimber</button>
+    <button class="tab-btn ${t==='cross'?'active':''}" onclick="go('penerimaan','cross')">Penerimaan Crosscut</button>
+    <button class="tab-btn ${t==='kaca'?'active':''}" onclick="go('penerimaan','kaca')">Penerimaan Kaca</button>
   </div>
-  ${t==='log'?frmLog():frmSaw()}`;
+  ${t==='log'?frmLog(): (t==='saw'?frmSaw(): (t==='cross'?frmCross():frmKaca()))}`;
+}
+
+function frmCross(){
+  return `
+  <div style="display:grid;grid-template-columns:1fr 420px;gap:20px;align-items:start">
+    <div class="card">
+      <div class="card-header">
+        <div><p style="font-size:14px;font-weight:700">Input Penerimaan Crosscut</p><p style="font-size:12px;color:#94a3b8;margin-top:2px">Catat penerimaan berupa kubik (m³) tanpa detail kayu/size/grade</p></div>
+      </div>
+      <form onsubmit="submitCross(event)" style="padding:24px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+          <div><label class="lbl">Tanggal Terima</label><input type="date" id="cx-date" value="${today()}" class="field field-green"></div>
+          <div><label class="lbl">Sumber / Keterangan</label><input type="text" id="cx-src" placeholder="cth: Supplier X / Pemotongan" class="field field-green"></div>
+        </div>
+        <div style="margin-bottom:16px">
+          <label class="lbl">Volume (m³)</label>
+          <input type="number" id="cx-m3" placeholder="0.000" step="0.001" min="0" class="field field-green">
+        </div>
+        <div style="margin-bottom:16px"><label class="lbl">No. Surat Jalan</label><input type="text" id="cx-sj" placeholder="opsional" class="field field-green"></div>
+        <div style="margin-bottom:20px"><label class="lbl">Catatan</label><textarea id="cx-notes" rows="2" placeholder="Catatan tambahan…" class="field field-green"></textarea></div>
+        <button type="submit" class="btn btn-green btn-lg" style="width:100%">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          Simpan Penerimaan Crosscut
+        </button>
+      </form>
+    </div>
+    <div class="card">
+      <div class="card-header"><span style="font-size:13px;font-weight:600">Penerimaan Crosscut Terbaru</span></div>
+      <div style="padding:0">
+        ${db.crosscuts.length===0?`<div class="empty" style="padding:40px 20px"><p style="font-size:13px">Belum ada data</p></div>`:`
+        <table class="tbl">
+          <thead><tr><th>Keterangan</th><th>m³</th><th>No SJ</th><th>Tanggal</th></tr></thead>
+          <tbody>${[...db.crosscuts].reverse().slice(0,10).map(c=>`<tr>
+            <td style="font-weight:500">${c.src||'-'}</td>
+            <td style="font-weight:700;color:#15803d">${(c.m3||0).toFixed(3)}</td>
+            <td style="color:#64748b">${c.sjNum||''}</td>
+            <td style="color:#94a3b8;font-size:12px">${fmtDate(c.date)}</td>
+          </tr>`).join('')}</tbody>
+        </table>`}
+      </div>
+    </div>
+  </div>`;
 }
 
 function frmLog(){
@@ -373,6 +420,70 @@ function frmSaw(){
         <table class="tbl">
           <thead><tr><th>Jenis</th><th>Gr</th><th>Ukuran</th><th>Qty</th><th>M³</th><th>Tgl</th></tr></thead>
           <tbody>${[...db.sawtimbers].reverse().slice(0,10).map(s=>`<tr>
+            <td style="font-weight:500">${s.wt}</td>
+            <td><span class="gr-badge gr-${s.gr}">${s.gr}</span></td>
+            <td style="font-size:12px">${sizeLabel(s.sid)}</td>
+            <td style="font-weight:700;color:#15803d">${s.qty}</td>
+            <td style="color:#64748b">${(s.m3||0).toFixed(4)}</td>
+            <td style="color:#94a3b8;font-size:12px">${fmtDate(s.date)}</td>
+          </tr>`).join('')}</tbody>
+        </table>`}
+      </div>
+    </div>
+  </div>
+  ${modalSzForm()}`;
+}
+
+function frmKaca(){
+  return `
+  <div style="display:grid;grid-template-columns:1fr 420px;gap:20px;align-items:start">
+    <div class="card">
+      <div class="card-header">
+        <div><p style="font-size:14px;font-weight:700">Input Penerimaan Kaca</p><p style="font-size:12px;color:#94a3b8;margin-top:2px">Catat penerimaan kaca dengan ukuran standar dan volume m³</p></div>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="openSzModal()">+ Ukuran Baru</button>
+      </div>
+      <form onsubmit="submitKaca(event)" style="padding:24px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+          <div><label class="lbl">Tanggal Terima</label><input type="date" id="kd-date" value="${today()}" class="field field-green"></div>
+          <div><label class="lbl">Jenis Kaca</label><input type="text" id="kd-wt" placeholder="cth: Kaca Bening, Kaca Cermin…" list="wt-l3" class="field field-green"><datalist id="wt-l3">${db.woodTypes.map(w=>`<option value="${w}">`).join('')}</datalist></div>
+        </div>
+        <div style="margin-bottom:16px">
+          <label class="lbl">Quality Grade</label>
+          <div style="display:flex;gap:10px">
+            ${['A','B','C','D'].map(g=>`<button type="button" onclick="pickGr('kaca','${g}')" data-gr="${g}" class="gbtn gbtn-${g} gbr-kaca" style="flex:1"><div style="font-size:16px;font-weight:800">${g}</div><div style="font-size:10px;margin-top:2px">${{A:'Tinggi',B:'Sedang',C:'Rendah',D:'Ditolak'}[g]}</div></button>`).join('')}
+          </div>
+          <input type="hidden" id="kaca-gr">
+        </div>
+        <div style="margin-bottom:16px">
+          <label class="lbl">Ukuran Kaca <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#94a3b8">(pilih standar)</span></label>
+          ${db.sizes.length===0?`<div style="border:2px dashed #e2e8f0;border-radius:10px;padding:16px;text-align:center;color:#94a3b8;font-size:12px">Belum ada ukuran standar. <button type="button" onclick="openSzModal()" style="color:#15803d;font-weight:600;background:none;border:none;cursor:pointer">Tambah ukuran</button></div>`:`
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+            ${db.sizes.map(sz=>`<button type="button" onclick="pickSzKaca('${sz.id}')" data-sid="${sz.id}" class="sz-card sz-card-kaca">
+              <p style="font-size:12px;font-weight:700;color:#0f172a">${sz.code}</p>
+              <p style="font-size:10px;color:#64748b;margin-top:3px">${sz.p}×${sz.l}×${sz.t} cm</p>
+              <p style="font-size:10px;color:#15803d;font-weight:600;margin-top:2px">${+(sz.p*sz.l*sz.t/1e6).toFixed(4)} m³</p>
+            </button>`).join('')}
+          </div>`}
+          <input type="hidden" id="kaca-sz">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px">
+          <div><label class="lbl">Jumlah (lembar)</label><input type="number" id="kd-qty" placeholder="0" min="1" oninput="autoKacaM3()" class="field field-green"></div>
+          <div><label class="lbl">M³ (opsional)</label><input type="number" id="kd-m3" placeholder="estimasi otomatis" step="0.0001" class="field field-green"></div>
+          <div><label class="lbl">No. Surat Jalan</label><input type="text" id="kd-sj" placeholder="opsional" class="field field-green"></div>
+        </div>
+        <button type="submit" class="btn btn-green btn-lg" style="width:100%">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          Simpan Penerimaan Kaca
+        </button>
+      </form>
+    </div>
+    <div class="card">
+      <div class="card-header"><span style="font-size:13px;font-weight:600">Penerimaan Kaca Terbaru</span></div>
+      <div style="padding:0">
+        ${db.kacas.length===0?`<div class="empty" style="padding:40px 20px"><p style="font-size:13px">Belum ada data</p></div>`:`
+        <table class="tbl">
+          <thead><tr><th>Jenis</th><th>Gr</th><th>Ukuran</th><th>Qty</th><th>M³</th><th>Tgl</th></tr></thead>
+          <tbody>${[...db.kacas].reverse().slice(0,10).map(s=>`<tr>
             <td style="font-weight:500">${s.wt}</td>
             <td><span class="gr-badge gr-${s.gr}">${s.gr}</span></td>
             <td style="font-size:12px">${sizeLabel(s.sid)}</td>
@@ -1087,6 +1198,12 @@ function pickSzSaw(sid){
   document.getElementById('saw-sz').value=sid;
   autoSawM3();
 }
+function pickSzKaca(sid){
+  szSel.kaca=sid;
+  document.querySelectorAll('.sz-card-kaca').forEach(b=>b.classList.toggle('sel',b.dataset.sid===sid));
+  document.getElementById('kaca-sz').value=sid;
+  autoKacaM3();
+}
 function pickSzCo(sid){
   szSel.co=sid;
   document.querySelectorAll('.sz-card-co').forEach(b=>b.classList.toggle('sel',b.dataset.sid===sid));
@@ -1096,6 +1213,12 @@ function autoSawM3(){
   const sid=document.getElementById('saw-sz')?.value;
   const qty=parseInt(document.getElementById('sd-qty')?.value||0);
   const m3inp=document.getElementById('sd-m3');
+  if(sid&&qty>0&&m3inp&&!m3inp._m) m3inp.value=+(m3Size(sid)*qty).toFixed(4);
+}
+function autoKacaM3(){
+  const sid=document.getElementById('kaca-sz')?.value;
+  const qty=parseInt(document.getElementById('kd-qty')?.value||0);
+  const m3inp=document.getElementById('kd-m3');
   if(sid&&qty>0&&m3inp&&!m3inp._m) m3inp.value=+(m3Size(sid)*qty).toFixed(4);
 }
 function onKvLogChange(){
@@ -1212,6 +1335,40 @@ function submitSaw(e){
   if(!db.woodTypes.includes(wt))db.woodTypes.push(wt);
   saveDb(); toast(`Sawtimber ${wt} Grade ${gr} · ${qty} lembar tersimpan`,'ok');
   go('penerimaan','saw');
+}
+
+function submitKaca(e){
+  e.preventDefault();
+  const date=document.getElementById('kd-date').value;
+  const wt=document.getElementById('kd-wt').value.trim();
+  const gr=document.getElementById('kaca-gr').value;
+  const sid=document.getElementById('kaca-sz').value;
+  const qty=parseInt(document.getElementById('kd-qty').value);
+  const m3v=document.getElementById('kd-m3').value;
+  const sj=document.getElementById('kd-sj').value;
+  if(!wt){toast('Isi jenis kaca','err');return}
+  if(!gr){toast('Pilih grade','err');return}
+  if(!sid){toast('Pilih ukuran kaca','err');return}
+  if(!qty||qty<1){toast('Isi jumlah lembar','err');return}
+  const m3=m3v?parseFloat(m3v):+(m3Size(sid)*qty).toFixed(4);
+  db.kacas.push({id:uid(),date,wt,gr,sid,qty,m3,sjNum:sj,src:'received'});
+  if(!db.woodTypes.includes(wt))db.woodTypes.push(wt);
+  saveDb(); toast(`Kaca ${wt} Grade ${gr} · ${qty} lembar tersimpan`,'ok');
+  go('penerimaan','kaca');
+}
+
+function submitCross(e){
+  e.preventDefault();
+  const date=document.getElementById('cx-date').value;
+  const m3v=document.getElementById('cx-m3').value;
+  const src=document.getElementById('cx-src')?.value.trim();
+  const sj=document.getElementById('cx-sj')?.value;
+  const notes=document.getElementById('cx-notes')?.value;
+  const m3=parseFloat(m3v);
+  if(isNaN(m3) || m3<=0){toast('Isi volume (m³) dengan benar','err');return}
+  db.crosscuts.push({id:uid(),date,src,m3,sjNum:sj,notes,srcType:'crosscut'});
+  saveDb(); toast(`Crosscut · ${m3.toFixed(3)} m³ tersimpan`,'ok');
+  go('penerimaan','cross');
 }
 
 function submitKonv(e){
