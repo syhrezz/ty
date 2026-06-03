@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WoodTrack Guide — Sistem Produksi Kayu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #050e2d;
+      --blue-900: #0f1f5c;
+      --blue-800: #1a3a8f;
+      --blue-600: #2563eb;
+      --blue-500: #3b82f6;
+      --blue-400: #60a5fa;
+      --blue-200: #bfdbfe;
+      --blue-100: #dbeafe;
+      --blue-50: #eff6ff;
+      --wood: #c2783a;
+      --wood-light: #e8b97a;
+      --wood-pale: #fdf4e7;
+      --white: #ffffff;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-400: #94a3b8;
+      --gray-600: #475569;
+      --gray-800: #1e293b;
+      --green: #059669;
+      --green-light: #d1fae5;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: #f0f4ff;
+      color: var(--gray-800);
+      overflow-x: hidden;
+    }
+
+    /* ─── NOISE TEXTURE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--blue-900) 50%, #1a1060 100%);
+      position: relative;
+      overflow: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .hero-bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(59,130,246,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,0.07) 1px, transparent 1px);
+      background-size: 60px 60px;
+      z-index: 1;
+    }
+
+    .hero-glow {
+      position: absolute;
+      width: 700px;
+      height: 700px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(59,130,246,0.22) 0%, transparent 70%);
+      top: -200px;
+      right: -100px;
+      z-index: 1;
+      animation: pulseGlow 6s ease-in-out infinite;
+    }
+    .hero-glow-2 {
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(194,120,58,0.18) 0%, transparent 70%);
+      bottom: 50px;
+      left: -80px;
+      z-index: 1;
+      animation: pulseGlow 8s ease-in-out infinite reverse;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.08); opacity: 0.7; }
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 80px 40px 60px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .hero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(59,130,246,0.15);
+      border: 1px solid rgba(96,165,250,0.3);
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--blue-400);
+      margin-bottom: 28px;
+    }
+
+    .hero-label-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--blue-400);
+      animation: blink 2s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .hero h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.6rem, 4.5vw, 4.8rem);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: var(--white);
+      margin-bottom: 24px;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--wood-light);
+    }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      line-height: 1.85;
+      color: rgba(255,255,255,0.62);
+      max-width: 480px;
+      margin-bottom: 36px;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .hero-badge {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.75);
+    }
+
+    /* ─── HERO ILLUSTRATION ─── */
+    .hero-visual {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-visual svg {
+      width: 100%;
+      max-width: 500px;
+      filter: drop-shadow(0 30px 60px rgba(0,0,0,0.4));
+      animation: floatCard 5s ease-in-out infinite;
+    }
+
+    @keyframes floatCard {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-16px); }
+    }
+
+    /* ─── SCROLL INDICATOR ─── */
+    .scroll-hint {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255,255,255,0.4);
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .scroll-hint-bar {
+      width: 1px;
+      height: 48px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
+      animation: scrollDown 2s ease-in-out infinite;
+    }
+
+    @keyframes scrollDown {
+      0% { transform: scaleY(0); transform-origin: top; }
+      50% { transform: scaleY(1); transform-origin: top; }
+      51% { transform: scaleY(1); transform-origin: bottom; }
+      100% { transform: scaleY(0); transform-origin: bottom; }
+    }
+
+    /* ─── STAT BAR ─── */
+    .stat-bar {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 0;
+      position: relative;
+      z-index: 10;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+
+    .stat-bar-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      divide: 1px;
+    }
+
+    .stat-item {
+      padding: 28px 24px;
+      border-right: 1px solid var(--gray-200);
+      position: relative;
+    }
+
+    .stat-item:last-child { border-right: none; }
+
+    .stat-item strong {
+      display: block;
+      font-family: 'DM Serif Display', serif;
+      font-size: 2.5rem;
+      color: var(--blue-600);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat-item span {
+      font-size: 0.85rem;
+      color: var(--gray-600);
+      font-weight: 500;
+    }
+
+    /* ─── MAIN CONTENT ─── */
+    .main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 80px 40px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── SECTION LABEL ─── */
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--blue-50);
+      border: 1px solid var(--blue-200);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--blue-600);
+      margin-bottom: 16px;
+    }
+
+    /* ─── SECTION HEADER ─── */
+    .section-head {
+      margin-bottom: 48px;
+    }
+
+    .section-head h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2rem, 3vw, 3rem);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      color: var(--navy);
+      margin-bottom: 16px;
+    }
+
+    .section-head p {
+      max-width: 600px;
+      line-height: 1.85;
+      color: var(--gray-600);
+      font-size: 1rem;
+    }
+
+    /* ─── PLATFORM SECTION ─── */
+    .platform-section {
+      margin-bottom: 100px;
+    }
+
+    .platform-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .platform-card {
+      border-radius: 28px;
+      padding: 36px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .platform-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 24px 60px rgba(37,99,235,0.12);
+    }
+
+    .platform-card.primary {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--blue-900) 100%);
+      color: white;
+      grid-row: span 2;
+    }
+
+    .platform-card.secondary {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.05);
+    }
+
+    .platform-card .card-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--blue-400);
+      margin-bottom: 20px;
+    }
+
+    .platform-card.secondary .card-tag {
+      background: var(--blue-50);
+      border-color: var(--blue-200);
+      color: var(--blue-600);
+    }
+
+    .platform-card h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.8rem;
+      line-height: 1.1;
+      margin-bottom: 14px;
+      color: var(--white);
+    }
+
+    .platform-card.secondary h3 {
+      color: var(--navy);
+      font-size: 1.3rem;
+    }
+
+    .platform-card p {
+      line-height: 1.8;
+      opacity: 0.72;
+      font-size: 0.95rem;
+    }
+
+    .platform-card.secondary p {
+      color: var(--gray-600);
+      opacity: 1;
+    }
+
+    /* Feature dots list */
+    .feature-dots {
+      list-style: none;
+      display: grid;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .feature-dots li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.88rem;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .feature-dots li::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--blue-400);
+      flex-shrink: 0;
+    }
+
+    /* ─── PLATFORM ILLUSTRATION ─── */
+    .platform-illustration {
+      margin-top: 28px;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    /* ─── WORKFLOW SECTION ─── */
+    .workflow-section {
+      margin-bottom: 100px;
+    }
+
+    .workflow-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+
+    .workflow-steps {
+      display: grid;
+      gap: 0;
+    }
+
+    .workflow-step {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 0;
+      position: relative;
+    }
+
+    .step-line-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .step-dot {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid var(--blue-600);
+      background: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.85rem;
+      color: var(--blue-600);
+      flex-shrink: 0;
+      z-index: 1;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .workflow-step:hover .step-dot {
+      background: var(--blue-600);
+      color: white;
+    }
+
+    .step-connector {
+      width: 2px;
+      flex: 1;
+      background: linear-gradient(to bottom, var(--blue-200), var(--blue-100));
+      min-height: 40px;
+    }
+
+    .workflow-step:last-child .step-connector {
+      display: none;
+    }
+
+    .step-body {
+      padding: 0 0 36px 20px;
+    }
+
+    .step-phase {
+      display: inline-flex;
+      align-items: center;
+      background: var(--green-light);
+      color: var(--green);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .step-body h4 {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+
+    .step-body p {
+      font-size: 0.88rem;
+      line-height: 1.75;
+      color: var(--gray-600);
+    }
+
+    /* ─── WORKFLOW VISUAL ─── */
+    .workflow-visual {
+      position: sticky;
+      top: 40px;
+    }
+
+    /* ─── OVERVIEW CARDS ─── */
+    .overview-section {
+      margin-bottom: 100px;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .overview-card {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 24px;
+      padding: 30px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .overview-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--blue-600), var(--blue-400));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .overview-card:hover {
+      border-color: var(--blue-200);
+      box-shadow: 0 12px 40px rgba(37,99,235,0.1);
+      transform: translateY(-3px);
+    }
+
+    .overview-card:hover::before {
+      opacity: 1;
+    }
+
+    .overview-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: var(--blue-50);
+      border: 1px solid var(--blue-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
+
+    .overview-card h3 {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--navy);
+      margin-bottom: 10px;
+    }
+
+    .overview-card p {
+      font-size: 0.875rem;
+      line-height: 1.8;
+      color: var(--gray-600);
+    }
+
+    /* ─── MASTER DATA ─── */
+    .data-section {
+      margin-bottom: 100px;
+    }
+
+    .data-bento {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 20px;
+    }
+
+    .bento-main {
+      background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
+      border-radius: 28px;
+      padding: 40px;
+      color: white;
+      grid-row: span 2;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bento-main::after {
+      content: '';
+      position: absolute;
+      bottom: -30px;
+      right: -30px;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .bento-main h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.8rem;
+      margin-bottom: 14px;
+      line-height: 1.15;
+    }
+
+    .bento-main p {
+      opacity: 0.72;
+      line-height: 1.8;
+      font-size: 0.92rem;
+      margin-bottom: 28px;
+    }
+
+    .stock-tags {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .stock-tag {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 14px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .stock-tag-label {
+      font-weight: 600;
+      font-size: 0.88rem;
+    }
+
+    .stock-tag-badge {
+      background: rgba(255,255,255,0.15);
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .bento-card {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 24px;
+      padding: 28px;
+      transition: all 0.3s;
+    }
+
+    .bento-card:hover {
+      border-color: var(--blue-200);
+      box-shadow: 0 8px 30px rgba(37,99,235,0.08);
+    }
+
+    .bento-card h4 {
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 10px;
+    }
+
+    .bento-card p {
+      font-size: 0.875rem;
+      line-height: 1.75;
+      color: var(--gray-600);
+    }
+
+    /* ─── BENEFITS SECTION ─── */
+    .benefits-section {
+      margin-bottom: 100px;
+      background: linear-gradient(135deg, var(--navy) 0%, #1a2a80 100%);
+      border-radius: 40px;
+      padding: 64px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .benefits-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(59,130,246,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    .benefits-section .section-head h2 {
+      color: white;
+    }
+
+    .benefits-section .section-head p {
+      color: rgba(255,255,255,0.55);
+    }
+
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .benefit-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 22px;
+      padding: 28px;
+      transition: all 0.3s;
+    }
+
+    .benefit-card:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(96,165,250,0.3);
+      transform: translateY(-3px);
+    }
+
+    .benefit-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(59,130,246,0.2);
+      border: 1px solid rgba(96,165,250,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .benefit-card h3 {
+      font-weight: 700;
+      font-size: 0.98rem;
+      color: white;
+      margin-bottom: 10px;
+    }
+
+    .benefit-card p {
+      font-size: 0.875rem;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.55);
+    }
+
+    /* ─── RECOMMENDATION SECTION ─── */
+    .recommendation-section {
+      margin-bottom: 100px;
+    }
+
+    .rec-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .rec-card {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 24px;
+      padding: 32px;
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 20px;
+      align-items: start;
+      transition: all 0.3s;
+    }
+
+    .rec-card:hover {
+      border-color: var(--blue-200);
+      box-shadow: 0 12px 40px rgba(37,99,235,0.09);
+    }
+
+    .rec-number {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: var(--blue-600);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .rec-card h4 {
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+
+    .rec-card p {
+      font-size: 0.875rem;
+      line-height: 1.8;
+      color: var(--gray-600);
+    }
+
+    /* ─── FOOTER ─── */
+    .footer {
+      background: var(--navy);
+      border-radius: 32px;
+      padding: 48px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+
+    .footer-brand h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.8rem;
+      color: white;
+      margin-bottom: 12px;
+    }
+
+    .footer-brand p {
+      color: rgba(255,255,255,0.5);
+      line-height: 1.8;
+      font-size: 0.9rem;
+    }
+
+    .footer-meta p {
+      color: rgba(255,255,255,0.35);
+      font-size: 0.82rem;
+      line-height: 1.7;
+    }
+
+    /* ─── STICKY NAV ─── */
+    .sticky-nav {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      background: rgba(5,14,45,0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 999px;
+      padding: 10px 6px;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .sticky-nav.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .sticky-nav a {
+      color: rgba(255,255,255,0.6);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 999px;
+      text-decoration: none;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .sticky-nav a:hover {
+      color: white;
+      background: rgba(59,130,246,0.2);
+    }
+
+    .sticky-nav-logo {
+      color: white;
+      font-weight: 800;
+      font-size: 0.85rem;
+      padding: 6px 16px;
+      border-right: 1px solid rgba(255,255,255,0.1);
+      margin-right: 4px;
+    }
+
+    /* ─── SECTION DIVIDER ─── */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gray-200), transparent);
+      margin: 0 0 80px;
+    }
+
+    /* ─── REVEAL ANIMATION ─── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      .hero-inner {
+        grid-template-columns: 1fr;
+        padding: 60px 24px 80px;
+      }
+      .hero-visual { display: none; }
+      .stat-bar-inner { grid-template-columns: 1fr 1fr; }
+      .stat-item:nth-child(2) { border-right: none; }
+      .main { padding: 60px 24px; }
+      .platform-grid { grid-template-columns: 1fr; }
+      .platform-card.primary { grid-row: span 1; }
+      .workflow-container { grid-template-columns: 1fr; }
+      .workflow-visual { display: none; }
+      .overview-grid { grid-template-columns: 1fr; }
+      .data-bento { grid-template-columns: 1fr; }
+      .bento-main { grid-row: span 1; }
+      .benefits-section { padding: 40px 24px; border-radius: 28px; }
+      .benefits-grid { grid-template-columns: 1fr; }
+      .rec-grid { grid-template-columns: 1fr; }
+      .footer { grid-template-columns: 1fr; padding: 36px 28px; }
+      .sticky-nav { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── STICKY NAV ── -->
+  <nav class="sticky-nav" id="stickyNav">
+    <span class="sticky-nav-logo">WoodTrack</span>
+    <a href="#overview">Overview</a>
+    <a href="#platform">Platform</a>
+    <a href="#workflow">Alur Produksi</a>
+    <a href="#data">Master Data</a>
+    <a href="#benefits">Nilai Bisnis</a>
+    <a href="#rec">Implementasi</a>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <div class="hero-bg-grid"></div>
+    <div class="hero-glow"></div>
+    <div class="hero-glow-2"></div>
+
+    <div class="hero-inner">
+      <div>
+        <div class="hero-label">
+          <span class="hero-label-dot"></span>
+          WoodTrack Guide — Panduan Stakeholder
+        </div>
+        <h1>Sistem Manajemen <em>Produksi Kayu</em> yang Terintegrasi</h1>
+        <p class="hero-desc">Panduan ringkas arsitektur, alur proses, dan nilai bisnis WoodTrack untuk tim operasional, pengadaan, dan manajemen industri kayu.</p>
+        <div class="hero-badges">
+          <span class="hero-badge">WoodTrack Pro Admin</span>
+          <span class="hero-badge">Mobile PWA</span>
+          <span class="hero-badge">Log → Sawtimber → Produk Jadi</span>
+          <span class="hero-badge">Grade A / B / C / D</span>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <!-- Dashboard Illustration SVG -->
+        <svg viewBox="0 0 480 400" xmlns="http://www.w3.org/2000/svg">
+          <!-- Background card -->
+          <rect x="0" y="20" width="460" height="360" rx="24" fill="#0f1f5c" opacity="0.8"/>
+          <rect x="12" y="32" width="436" height="336" rx="18" fill="#1a2a6e"/>
+
+          <!-- Top bar -->
+          <rect x="12" y="32" width="436" height="52" rx="18" fill="#0f1f5c"/>
+          <rect x="12" y="64" width="436" height="20" fill="#0f1f5c"/>
+          <circle cx="36" cy="58" r="7" fill="#ef4444" opacity="0.7"/>
+          <circle cx="56" cy="58" r="7" fill="#f59e0b" opacity="0.7"/>
+          <circle cx="76" cy="58" r="7" fill="#10b981" opacity="0.7"/>
+          <rect x="100" y="50" width="100" height="16" rx="8" fill="rgba(255,255,255,0.08)"/>
+          <rect x="360" y="48" width="68" height="20" rx="10" fill="rgba(59,130,246,0.3)"/>
+
+          <!-- Sidebar -->
+          <rect x="12" y="84" width="80" height="284" rx="0" fill="rgba(0,0,0,0.15)"/>
+          <rect x="24" y="100" width="56" height="36" rx="10" fill="rgba(59,130,246,0.4)"/>
+          <rect x="32" y="112" width="40" height="4" rx="2" fill="white" opacity="0.8"/>
+          <rect x="32" y="119" width="28" height="3" rx="2" fill="white" opacity="0.3"/>
+          <rect x="24" y="148" width="56" height="36" rx="10" fill="rgba(255,255,255,0.04)"/>
+          <rect x="32" y="160" width="40" height="4" rx="2" fill="white" opacity="0.4"/>
+          <rect x="32" y="167" width="28" height="3" rx="2" fill="white" opacity="0.2"/>
+          <rect x="24" y="196" width="56" height="36" rx="10" fill="rgba(255,255,255,0.04)"/>
+          <rect x="32" y="208" width="40" height="4" rx="2" fill="white" opacity="0.4"/>
+          <rect x="32" y="215" width="28" height="3" rx="2" fill="white" opacity="0.2"/>
+          <rect x="24" y="244" width="56" height="36" rx="10" fill="rgba(255,255,255,0.04)"/>
+          <rect x="32" y="256" width="40" height="4" rx="2" fill="white" opacity="0.4"/>
+          <rect x="32" y="263" width="28" height="3" rx="2" fill="white" opacity="0.2"/>
+
+          <!-- Main content area -->
+          <!-- KPI Row -->
+          <rect x="104" y="92" width="90" height="68" rx="12" fill="rgba(37,99,235,0.3)" stroke="rgba(96,165,250,0.3)" stroke-width="1"/>
+          <text x="149" y="120" text-anchor="middle" fill="#60a5fa" font-size="18" font-weight="800" font-family="sans-serif">248</text>
+          <rect x="116" y="126" width="66" height="6" rx="3" fill="rgba(255,255,255,0.2)"/>
+          <rect x="122" y="135" width="54" height="4" rx="2" fill="rgba(255,255,255,0.1)"/>
+
+          <rect x="204" y="92" width="90" height="68" rx="12" fill="rgba(16,185,129,0.2)" stroke="rgba(52,211,153,0.3)" stroke-width="1"/>
+          <text x="249" y="120" text-anchor="middle" fill="#34d399" font-size="18" font-weight="800" font-family="sans-serif">1.2K</text>
+          <rect x="216" y="126" width="66" height="6" rx="3" fill="rgba(255,255,255,0.2)"/>
+          <rect x="222" y="135" width="54" height="4" rx="2" fill="rgba(255,255,255,0.1)"/>
+
+          <rect x="304" y="92" width="90" height="68" rx="12" fill="rgba(245,158,11,0.2)" stroke="rgba(251,191,36,0.3)" stroke-width="1"/>
+          <text x="349" y="120" text-anchor="middle" fill="#fbbf24" font-size="18" font-weight="800" font-family="sans-serif">87</text>
+          <rect x="316" y="126" width="66" height="6" rx="3" fill="rgba(255,255,255,0.2)"/>
+          <rect x="322" y="135" width="54" height="4" rx="2" fill="rgba(255,255,255,0.1)"/>
+
+          <!-- Chart area -->
+          <rect x="104" y="172" width="160" height="120" rx="12" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+          <rect x="114" y="180" width="80" height="5" rx="2.5" fill="rgba(255,255,255,0.3)"/>
+          <rect x="114" y="188" width="50" height="4" rx="2" fill="rgba(255,255,255,0.1)"/>
+          <!-- Bar chart -->
+          <rect x="120" y="245" width="14" height="28" rx="4" fill="rgba(37,99,235,0.6)"/>
+          <rect x="140" y="235" width="14" height="38" rx="4" fill="rgba(37,99,235,0.7)"/>
+          <rect x="160" y="220" width="14" height="53" rx="4" fill="rgba(59,130,246,0.85)"/>
+          <rect x="180" y="230" width="14" height="43" rx="4" fill="rgba(37,99,235,0.7)"/>
+          <rect x="200" y="215" width="14" height="58" rx="4" fill="#3b82f6"/>
+          <rect x="220" y="225" width="14" height="48" rx="4" fill="rgba(37,99,235,0.7)"/>
+          <rect x="240" y="210" width="14" height="63" rx="4" fill="rgba(59,130,246,0.9)"/>
+
+          <!-- List items -->
+          <rect x="274" y="172" width="160" height="120" rx="12" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+          <rect x="284" y="182" width="70" height="5" rx="2.5" fill="rgba(255,255,255,0.3)"/>
+          <rect x="284" y="200" width="140" height="24" rx="7" fill="rgba(255,255,255,0.05)"/>
+          <circle cx="296" cy="212" r="5" fill="rgba(59,130,246,0.6)"/>
+          <rect x="306" y="208" width="60" height="4" rx="2" fill="rgba(255,255,255,0.3)"/>
+          <rect x="306" y="215" width="40" height="3" rx="1.5" fill="rgba(255,255,255,0.15)"/>
+          <rect x="390" y="208" width="24" height="8" rx="4" fill="rgba(16,185,129,0.4)"/>
+          <rect x="284" y="230" width="140" height="24" rx="7" fill="rgba(255,255,255,0.05)"/>
+          <circle cx="296" cy="242" r="5" fill="rgba(245,158,11,0.6)"/>
+          <rect x="306" y="238" width="55" height="4" rx="2" fill="rgba(255,255,255,0.3)"/>
+          <rect x="306" y="245" width="45" height="3" rx="1.5" fill="rgba(255,255,255,0.15)"/>
+          <rect x="390" y="238" width="24" height="8" rx="4" fill="rgba(245,158,11,0.4)"/>
+          <rect x="284" y="260" width="140" height="24" rx="7" fill="rgba(255,255,255,0.05)"/>
+          <circle cx="296" cy="272" r="5" fill="rgba(139,92,246,0.6)"/>
+          <rect x="306" y="268" width="65" height="4" rx="2" fill="rgba(255,255,255,0.3)"/>
+          <rect x="306" y="275" width="35" height="3" rx="1.5" fill="rgba(255,255,255,0.15)"/>
+          <rect x="390" y="268" width="24" height="8" rx="4" fill="rgba(139,92,246,0.4)"/>
+
+          <!-- Bottom area -->
+          <rect x="104" y="304" width="340" height="60" rx="12" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+          <!-- Progress bar -->
+          <rect x="116" y="318" width="200" height="5" rx="2.5" fill="rgba(255,255,255,0.3)"/>
+          <rect x="116" y="326" width="100" height="4" rx="2" fill="rgba(255,255,255,0.1)"/>
+          <rect x="116" y="340" width="316" height="6" rx="3" fill="rgba(255,255,255,0.06)"/>
+          <rect x="116" y="340" width="200" height="6" rx="3" fill="rgba(37,99,235,0.6)"/>
+          <rect x="116" y="350" width="316" height="6" rx="3" fill="rgba(255,255,255,0.06)"/>
+          <rect x="116" y="350" width="140" height="6" rx="3" fill="rgba(16,185,129,0.5)"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="scroll-hint">
+      <span>Gulir ke bawah</span>
+      <div class="scroll-hint-bar"></div>
+    </div>
+  </section>
+
+  <!-- ── STAT BAR ── -->
+  <div class="stat-bar">
+    <div class="stat-bar-inner">
+      <div class="stat-item">
+        <strong>8</strong>
+        <span>Modul terintegrasi</span>
+      </div>
+      <div class="stat-item">
+        <strong>4</strong>
+        <span>Grade kayu terkelola (A/B/C/D)</span>
+      </div>
+      <div class="stat-item">
+        <strong>3</strong>
+        <span>Tahapan produksi inti</span>
+      </div>
+      <div class="stat-item">
+        <strong>2</strong>
+        <span>Antarmuka: Admin + Mobile PWA</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MAIN CONTENT ── -->
+  <main class="main">
+
+    <!-- OVERVIEW -->
+    <section id="overview" class="overview-section reveal">
+      <div class="section-head">
+        <div class="section-label">Overview</div>
+        <h2>Apa itu WoodTrack?</h2>
+        <p>WoodTrack adalah sistem manajemen produksi kayu yang dirancang untuk operasi hulu-hilir — mencakup penerimaan log, pengolahan menjadi sawtimber, hingga produksi barang jadi seperti pintu dan jendela.</p>
+      </div>
+      <div class="overview-grid">
+        <div class="overview-card">
+          <div class="overview-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2Z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+            </svg>
+          </div>
+          <h3>Manajemen Bahan Baku</h3>
+          <p>Pencatatan penerimaan log dan sawtimber langsung di sistem, lengkap dengan jenis kayu, grade, ukuran, volume, dan bukti kirim.</p>
+        </div>
+        <div class="overview-card">
+          <div class="overview-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 3H2v15h7c1.7 0 3 1.3 3 3V7c0-2.2-1.8-4-4-4Z"/><path d="M16 3h6v15h-7c-1.7 0-3 1.3-3 3V7c0-2.2 1.8-4 4-4Z"/>
+            </svg>
+          </div>
+          <h3>Konversi & Alokasi</h3>
+          <p>Fitur konversi mencatat proses pengolahan log menjadi sawtimber, menjaga hubungan stok dan memastikan bahan baku tersusun dengan rapi.</p>
+        </div>
+        <div class="overview-card">
+          <div class="overview-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/>
+            </svg>
+          </div>
+          <h3>Produksi & Hasil Jadi</h3>
+          <p>Produksi produk jadi direkam dengan referensi varian, grade produk, konsumsi sawtimber, dan kuantitas unit untuk kontrol stok akhir.</p>
+        </div>
+        <div class="overview-card">
+          <div class="overview-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>
+            </svg>
+          </div>
+          <h3>Riwayat & Pelaporan</h3>
+          <p>Aktivitas terperinci dicatat di modul riwayat transaksi untuk memantau alur material, volume, dan hasil produksi harian.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- PLATFORM -->
+    <section id="platform" class="platform-section reveal">
+      <div class="section-head">
+        <div class="section-label">Struktur Platform</div>
+        <h2>Dua pengalaman digital yang saling melengkapi</h2>
+        <p>WoodTrack hadir sebagai antarmuka admin web untuk monitoring dan manajemen, serta aplikasi mobile PWA untuk operasi lapangan secara langsung.</p>
+      </div>
+      <div class="platform-grid">
+        <!-- Primary card: Web Admin -->
+        <div class="platform-card primary">
+          <div class="card-tag">Antarmuka 01</div>
+          <h3>Web Admin Panel</h3>
+          <p>Antarmuka utama untuk manajemen stok, dashboard visual, master data, input penerimaan, konversi, produksi, dan riwayat transaksi secara menyeluruh.</p>
+          <ul class="feature-dots">
+            <li>Dashboard real-time</li>
+            <li>Manajemen master data produk & material</li>
+            <li>Modul riwayat & pelaporan</li>
+            <li>Kontrol grade A / B / C / D</li>
+            <li>Visibilitas stok tiga lapisan</li>
+          </ul>
+          <!-- Mini illustration: browser mockup -->
+          <div class="platform-illustration">
+            <svg viewBox="0 0 340 160" xmlns="http://www.w3.org/2000/svg" style="border-radius:12px">
+              <rect width="340" height="160" rx="12" fill="rgba(255,255,255,0.05)"/>
+              <rect width="340" height="28" rx="12" fill="rgba(0,0,0,0.2)"/>
+              <rect y="16" width="340" height="12" fill="rgba(0,0,0,0.2)"/>
+              <circle cx="14" cy="14" r="4" fill="#ef4444" opacity="0.6"/>
+              <circle cx="26" cy="14" r="4" fill="#f59e0b" opacity="0.6"/>
+              <circle cx="38" cy="14" r="4" fill="#10b981" opacity="0.6"/>
+              <rect x="56" y="9" width="120" height="10" rx="5" fill="rgba(255,255,255,0.07)"/>
+              <!-- Content -->
+              <rect x="10" y="38" width="60" height="60" rx="8" fill="rgba(37,99,235,0.3)"/>
+              <rect x="16" y="44" width="40" height="6" rx="3" fill="rgba(255,255,255,0.4)"/>
+              <rect x="16" y="54" width="28" height="20" rx="4" fill="rgba(255,255,255,0.15)"/>
+              <rect x="80" y="38" width="60" height="60" rx="8" fill="rgba(16,185,129,0.25)"/>
+              <rect x="86" y="44" width="40" height="6" rx="3" fill="rgba(255,255,255,0.4)"/>
+              <rect x="86" y="54" width="28" height="20" rx="4" fill="rgba(255,255,255,0.15)"/>
+              <rect x="150" y="38" width="180" height="60" rx="8" fill="rgba(255,255,255,0.04)"/>
+              <rect x="160" y="46" width="80" height="5" rx="2.5" fill="rgba(255,255,255,0.3)"/>
+              <!-- bars -->
+              <rect x="162" y="74" width="10" height="16" rx="3" fill="rgba(59,130,246,0.5)"/>
+              <rect x="178" y="68" width="10" height="22" rx="3" fill="rgba(59,130,246,0.65)"/>
+              <rect x="194" y="62" width="10" height="28" rx="3" fill="#3b82f6"/>
+              <rect x="210" y="66" width="10" height="24" rx="3" fill="rgba(59,130,246,0.7)"/>
+              <rect x="226" y="58" width="10" height="32" rx="3" fill="#60a5fa"/>
+              <!-- Bottom row -->
+              <rect x="10" y="108" width="320" height="18" rx="6" fill="rgba(255,255,255,0.04)"/>
+              <rect x="16" y="113" width="140" height="4" rx="2" fill="rgba(255,255,255,0.2)"/>
+              <rect x="290" y="112" width="34" height="6" rx="3" fill="rgba(37,99,235,0.4)"/>
+              <rect x="10" y="132" width="320" height="18" rx="6" fill="rgba(255,255,255,0.03)"/>
+              <rect x="16" y="137" width="100" height="4" rx="2" fill="rgba(255,255,255,0.15)"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Secondary: Mobile PWA -->
+        <div class="platform-card secondary">
+          <div class="card-tag">Antarmuka 02</div>
+          <h3>Mobile PWA</h3>
+          <p>Mode mobile untuk field operation — input penerimaan log, penerimaan sawtimber, konversi cepat, dan pengecekan stok saat di gudang atau lapangan.</p>
+          <!-- Mobile illustration -->
+          <div class="platform-illustration" style="margin-top: 20px;">
+            <svg viewBox="0 0 180 120" xmlns="http://www.w3.org/2000/svg" style="width:100%; border-radius:10px; background: #f0f4ff;">
+              <!-- Phone outline -->
+              <rect x="60" y="5" width="60" height="110" rx="10" fill="#0f1f5c"/>
+              <rect x="64" y="14" width="52" height="82" rx="6" fill="#1e3a8a"/>
+              <!-- Screen content -->
+              <rect x="68" y="18" width="44" height="8" rx="3" fill="rgba(255,255,255,0.15)"/>
+              <rect x="68" y="30" width="44" height="22" rx="6" fill="rgba(37,99,235,0.4)"/>
+              <rect x="73" y="35" width="20" height="4" rx="2" fill="rgba(255,255,255,0.5)"/>
+              <rect x="73" y="42" width="30" height="3" rx="1.5" fill="rgba(255,255,255,0.2)"/>
+              <rect x="68" y="56" width="20" height="18" rx="5" fill="rgba(16,185,129,0.3)"/>
+              <rect x="92" y="56" width="20" height="18" rx="5" fill="rgba(245,158,11,0.3)"/>
+              <rect x="68" y="78" width="44" height="5" rx="2.5" fill="rgba(255,255,255,0.08)"/>
+              <rect x="68" y="78" width="28" height="5" rx="2.5" fill="rgba(59,130,246,0.6)"/>
+              <rect x="68" y="87" width="44" height="5" rx="2.5" fill="rgba(255,255,255,0.08)"/>
+              <rect x="68" y="87" width="18" height="5" rx="2.5" fill="rgba(16,185,129,0.5)"/>
+              <!-- Home button -->
+              <circle cx="90" cy="106" r="4" fill="rgba(255,255,255,0.15)"/>
+              <!-- Floating action dots -->
+              <circle cx="30" cy="30" r="12" fill="#dbeafe" opacity="0.6"/>
+              <circle cx="150" cy="80" r="8" fill="#dbeafe" opacity="0.4"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Secondary: Master Data -->
+        <div class="platform-card secondary">
+          <div class="card-tag">Modul 03</div>
+          <h3>Master Data Terpusat</h3>
+          <p>Produk, varian, ukuran standar, dan jenis kayu tersimpan dalam satu sumber kebenaran untuk konsistensi produksi menyeluruh.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- WORKFLOW -->
+    <section id="workflow" class="workflow-section reveal">
+      <div class="section-head">
+        <div class="section-label">Alur Produksi</div>
+        <h2>Tiga tahap rantai nilai kayu</h2>
+        <p>WoodTrack mencatat setiap tahapan produksi — dari bahan baku hingga produk akhir — untuk memastikan kejelasan stok dan kualitas di seluruh lini.</p>
+      </div>
+      <div class="workflow-container">
+        <div class="workflow-steps">
+          <div class="workflow-step">
+            <div class="step-line-col">
+              <div class="step-dot">1</div>
+              <div class="step-connector"></div>
+            </div>
+            <div class="step-body">
+              <div class="step-phase">Penerimaan</div>
+              <h4>Penerimaan Log</h4>
+              <p>Data masuk log dicatat dengan jenis kayu, grade, ukuran diameter, dan jumlah batang. Stok log menjadi sumber transaksi berikutnya.</p>
+            </div>
+          </div>
+          <div class="workflow-step">
+            <div class="step-line-col">
+              <div class="step-dot">2</div>
+              <div class="step-connector"></div>
+            </div>
+            <div class="step-body">
+              <div class="step-phase">Penerimaan</div>
+              <h4>Penerimaan Sawtimber</h4>
+              <p>Untuk material siap olah, input sawtimber meliputi jenis kayu, grade, ukuran standar, jumlah lembar, dan volume.</p>
+            </div>
+          </div>
+          <div class="workflow-step">
+            <div class="step-line-col">
+              <div class="step-dot">3</div>
+              <div class="step-connector"></div>
+            </div>
+            <div class="step-body">
+              <div class="step-phase">Konversi</div>
+              <h4>Konversi Log → Sawtimber</h4>
+              <p>Proses pengolahan log ke sawtimber dicatat dengan pilihan stok log, output ukuran, grade final, dan kuantitas lembar hasil.</p>
+            </div>
+          </div>
+          <div class="workflow-step">
+            <div class="step-line-col">
+              <div class="step-dot">4</div>
+              <div class="step-connector"></div>
+            </div>
+            <div class="step-body">
+              <div class="step-phase">Produksi</div>
+              <h4>Produksi Produk Jadi</h4>
+              <p>Hasil produksi direkam dengan varian produk, grade, jumlah unit, dan konsumsi sawtimber. Data ini langsung mempengaruhi stok barang jadi.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Workflow Visual -->
+        <div class="workflow-visual">
+          <svg viewBox="0 0 300 380" xmlns="http://www.w3.org/2000/svg">
+            <!-- Background -->
+            <rect width="300" height="380" rx="24" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
+
+            <!-- Title -->
+            <rect x="20" y="20" width="120" height="8" rx="4" fill="#bfdbfe"/>
+            <rect x="20" y="34" width="80" height="6" rx="3" fill="#dbeafe"/>
+
+            <!-- Flow diagram nodes -->
+            <!-- Node 1: Log -->
+            <rect x="20" y="60" width="120" height="60" rx="14" fill="#1d4ed8"/>
+            <rect x="30" y="72" width="50" height="6" rx="3" fill="rgba(255,255,255,0.8)"/>
+            <rect x="30" y="82" width="80" height="4" rx="2" fill="rgba(255,255,255,0.3)"/>
+            <rect x="30" y="90" width="60" height="4" rx="2" fill="rgba(255,255,255,0.3)"/>
+            <rect x="30" y="98" width="70" height="4" rx="2" fill="rgba(255,255,255,0.3)"/>
+            <!-- Badges -->
+            <rect x="110" y="68" width="22" height="12" rx="6" fill="rgba(255,255,255,0.15)"/>
+            <rect x="113" y="71" width="16" height="6" rx="3" fill="rgba(255,255,255,0.5)"/>
+
+            <!-- Arrow 1 -->
+            <line x1="80" y1="120" x2="80" y2="148" stroke="#bfdbfe" stroke-width="2" stroke-dasharray="4,3"/>
+            <polygon points="74,148 80,158 86,148" fill="#93c5fd"/>
+
+            <!-- Node 2: Sawlog -->
+            <rect x="20" y="158" width="120" height="60" rx="14" fill="#1d4ed8" opacity="0.8"/>
+            <rect x="30" y="170" width="60" height="6" rx="3" fill="rgba(255,255,255,0.8)"/>
+            <rect x="30" y="180" width="80" height="4" rx="2" fill="rgba(255,255,255,0.3)"/>
+            <rect x="30" y="188" width="50" height="4" rx="2" fill="rgba(255,255,255,0.3)"/>
+            <rect x="30" y="196" width="70" height="4" rx="2" fill="rgba(255,255,255,0.3)"/>
+            <rect x="110" y="166" width="22" height="12" rx="6" fill="rgba(255,255,255,0.15)"/>
+            <rect x="113" y="169" width="16" height="6" rx="3" fill="rgba(255,255,255,0.5)"/>
+
+            <!-- Arrow 2 -->
+            <line x1="80" y1="218" x2="80" y2="246" stroke="#bfdbfe" stroke-width="2" stroke-dasharray="4,3"/>
+            <polygon points="74,246 80,256 86,246" fill="#93c5fd"/>
+
+            <!-- Node 3: Product -->
+            <rect x="20" y="256" width="120" height="60" rx="14" fill="#1e40af"/>
+            <rect x="30" y="268" width="70" height="6" rx="3" fill="rgba(255,255,255,0.8)"/>
+            <rect x="30" y="278" width="80" height="4" rx="2" fill="rgba(255,255,255,0.3)"/>
+            <rect x="30" y="286" width="55" height="4" rx="2" fill="rgba(255,255,255,0.3)"/>
+            <rect x="30" y="294" width="65" height="4" rx="2" fill="rgba(255,255,255,0.3)"/>
+            <rect x="110" y="264" width="22" height="12" rx="6" fill="rgba(16,185,129,0.3)"/>
+            <rect x="113" y="267" width="16" height="6" rx="3" fill="rgba(52,211,153,0.7)"/>
+
+            <!-- Right side: Grade indicator -->
+            <rect x="160" y="60" width="120" height="256" rx="14" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+            <rect x="172" y="74" width="60" height="6" rx="3" fill="#bfdbfe"/>
+            <rect x="172" y="84" width="40" height="4" rx="2" fill="#dbeafe"/>
+
+            <!-- Grade bars -->
+            <rect x="172" y="100" width="96" height="8" rx="3" fill="#eff6ff"/>
+            <rect x="172" y="100" width="80" height="8" rx="3" fill="#2563eb" opacity="0.9"/>
+            <rect x="271" y="100" width="6" height="8" rx="2" fill="transparent"/>
+            <text x="172" y="123" font-size="9" fill="#475569" font-family="sans-serif" font-weight="600">Grade A</text>
+            <text x="245" y="123" font-size="9" fill="#2563eb" font-family="sans-serif" font-weight="700">80%</text>
+
+            <rect x="172" y="130" width="96" height="8" rx="3" fill="#eff6ff"/>
+            <rect x="172" y="130" width="55" height="8" rx="3" fill="#3b82f6" opacity="0.7"/>
+            <text x="172" y="153" font-size="9" fill="#475569" font-family="sans-serif" font-weight="600">Grade B</text>
+            <text x="245" y="153" font-size="9" fill="#3b82f6" font-family="sans-serif" font-weight="700">57%</text>
+
+            <rect x="172" y="160" width="96" height="8" rx="3" fill="#eff6ff"/>
+            <rect x="172" y="160" width="35" height="8" rx="3" fill="#60a5fa" opacity="0.6"/>
+            <text x="172" y="183" font-size="9" fill="#475569" font-family="sans-serif" font-weight="600">Grade C</text>
+            <text x="245" y="183" font-size="9" fill="#60a5fa" font-family="sans-serif" font-weight="700">36%</text>
+
+            <rect x="172" y="190" width="96" height="8" rx="3" fill="#eff6ff"/>
+            <rect x="172" y="190" width="20" height="8" rx="3" fill="#93c5fd" opacity="0.6"/>
+            <text x="172" y="213" font-size="9" fill="#475569" font-family="sans-serif" font-weight="600">Grade D</text>
+            <text x="245" y="213" font-size="9" fill="#93c5fd" font-family="sans-serif" font-weight="700">21%</text>
+
+            <!-- Divider -->
+            <line x1="172" y1="228" x2="268" y2="228" stroke="#e2e8f0" stroke-width="1"/>
+
+            <!-- Volume stat -->
+            <rect x="172" y="238" width="44" height="32" rx="8" fill="#eff6ff"/>
+            <text x="194" y="257" text-anchor="middle" font-size="11" fill="#1d4ed8" font-family="sans-serif" font-weight="800">1.2k</text>
+            <text x="194" y="265" text-anchor="middle" font-size="7" fill="#94a3b8" font-family="sans-serif">unit</text>
+
+            <rect x="222" y="238" width="44" height="32" rx="8" fill="#f0fdf4"/>
+            <text x="244" y="257" text-anchor="middle" font-size="11" fill="#059669" font-family="sans-serif" font-weight="800">98%</text>
+            <text x="244" y="265" text-anchor="middle" font-size="7" fill="#94a3b8" font-family="sans-serif">akurasi</text>
+
+            <!-- Bottom note -->
+            <rect x="172" y="284" width="96" height="18" rx="6" fill="#dbeafe"/>
+            <rect x="178" y="290" width="70" height="4" rx="2" fill="#3b82f6" opacity="0.6"/>
+            <rect x="172" y="308" width="96" height="18" rx="6" fill="#d1fae5"/>
+            <rect x="178" y="314" width="55" height="4" rx="2" fill="#059669" opacity="0.6"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- MASTER DATA -->
+    <section id="data" class="data-section reveal">
+      <div class="section-head">
+        <div class="section-label">Master Data & Inventaris</div>
+        <h2>Satu sumber kebenaran untuk seluruh operasi</h2>
+        <p>Modul master menjamin semua produk, varian, dan ukuran bahan baku terkelola — memastikan input operasional konsisten dan mudah dilacak.</p>
+      </div>
+      <div class="data-bento">
+        <div class="bento-main">
+          <h3>Manajemen Stok Real-time</h3>
+          <p>Stok dilihat dalam tiga tampilan terpisah: log, sawtimber, dan produk jadi. Setiap saldo dapat ditelusuri ke transaksi penerimaan, konversi, dan produksi.</p>
+          <div class="stock-tags">
+            <div class="stock-tag">
+              <span class="stock-tag-label">Stok Log</span>
+              <span class="stock-tag-badge">Per batang & volume</span>
+            </div>
+            <div class="stock-tag">
+              <span class="stock-tag-label">Stok Sawtimber</span>
+              <span class="stock-tag-badge">Per lembar & m³</span>
+            </div>
+            <div class="stock-tag">
+              <span class="stock-tag-label">Stok Produk Jadi</span>
+              <span class="stock-tag-badge">Per unit & varian</span>
+            </div>
+          </div>
+        </div>
+        <div class="bento-card">
+          <h4>Master Produk & Varian</h4>
+          <p>Definisikan kategori produk seperti pintu panel, pintu flush, pintu krepyak, dan jendela casement. Varian produk menyimpan kode, dimensi, dan estimasi volume.</p>
+        </div>
+        <div class="bento-card">
+          <h4>Master Material</h4>
+          <p>Tambahkan ukuran sawtimber standar dan jenis kayu yang digunakan sehingga input bahan baku dan output produksi saling terhubung secara otomatis.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- BENEFITS -->
+    <section id="benefits" class="benefits-section reveal">
+      <div class="section-head" style="position:relative;z-index:1;">
+        <div class="section-label" style="background:rgba(59,130,246,0.15);border-color:rgba(96,165,250,0.3);color:var(--blue-400);">Nilai Bisnis</div>
+        <h2>Mengapa WoodTrack penting untuk bisnis Anda</h2>
+        <p>WoodTrack tidak hanya mendukung operasi produksi. Sistem ini menyediakan data untuk pengendalian kualitas, perencanaan bahan, dan pengambilan keputusan manajerial.</p>
+      </div>
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6"/><path d="M8 11h6"/>
+            </svg>
+          </div>
+          <h3>Transparansi Stok</h3>
+          <p>Setiap material tersusun berdasarkan grade dan ukuran. Level stok terlihat saat itu juga, mengurangi risiko kekurangan atau surplus bahan baku.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <h3>Kontrol Kualitas</h3>
+          <p>Grade A/B/C/D diterapkan di seluruh alur produksi, sehingga kualitas log, sawtimber, dan produk akhir dapat dipantau secara konsisten.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="10" height="14" x="3" y="8" rx="2"/><path d="M5 4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7"/>
+              <path d="M16 2v4"/><path d="M8 18h4"/><path d="M8 14h8"/>
+            </svg>
+          </div>
+          <h3>Dual Interface</h3>
+          <p>Admin menyediakan visibilitas penuh, sementara mobile PWA mendukung input cepat di lapangan tanpa menunggu akses desktop.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+            </svg>
+          </div>
+          <h3>Rekam Jejak Operasional</h3>
+          <p>Modul riwayat merekam setiap transaksi, memungkinkan audit internal dan evaluasi performa produksi secara terstruktur.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- RECOMMENDATION -->
+    <section id="rec" class="recommendation-section reveal">
+      <div class="section-head">
+        <div class="section-label">Implementasi</div>
+        <h2>Rekomendasi fase awal implementasi</h2>
+        <p>Untuk memaksimalkan manfaat WoodTrack, berikut fokus awal yang direkomendasikan untuk fase pilot dan rollout operasional.</p>
+      </div>
+      <div class="rec-grid">
+        <div class="rec-card">
+          <div class="rec-number">1</div>
+          <div>
+            <h4>Validasi Master Data</h4>
+            <p>Mulai dengan memastikan daftar jenis kayu, ukuran sawtimber, produk, dan variannya sudah lengkap dan sesuai standar pabrik sebelum operasi dimulai.</p>
+          </div>
+        </div>
+        <div class="rec-card">
+          <div class="rec-number">2</div>
+          <div>
+            <h4>Mulai dari Penerimaan Bahan Baku</h4>
+            <p>Implementasikan pencatatan log dan sawtimber pada tahap masuk gudang untuk menciptakan baseline stok yang akurat sejak awal.</p>
+          </div>
+        </div>
+        <div class="rec-card">
+          <div class="rec-number">3</div>
+          <div>
+            <h4>Sinkronkan Konversi & Produksi</h4>
+            <p>Catat setiap proses konversi log ke sawtimber dan produksi barang jadi agar volume input sebanding dengan hasil output secara terukur.</p>
+          </div>
+        </div>
+        <div class="rec-card">
+          <div class="rec-number">4</div>
+          <div>
+            <h4>Gunakan Laporan sebagai Kontrol</h4>
+            <p>Monitor dashboard dan riwayat transaksi untuk mengidentifikasi hambatan produksi, ketidaksesuaian grade, atau deviasi stok secara berkala.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="footer-brand">
+        <h3>WoodTrack</h3>
+        <p>Sistem manajemen produksi kayu yang dirancang untuk menggabungkan operasi gudang, proses pengolahan, dan stok produk jadi dalam antarmuka yang mudah digunakan.</p>
+      </div>
+      <div class="footer-meta">
+        <p>Dokumen panduan ini mencakup arsitektur platform, alur produksi, dan nilai bisnis WoodTrack berdasarkan struktur aplikasi admin panel, mobile PWA, dan sistem manajemen stok kayu.</p>
+      </div>
+    </footer>
+
+  </main>
+
+  <script>
+    // Sticky nav
+    const nav = document.getElementById('stickyNav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('visible', window.scrollY > 500);
+    });
+
+    // Reveal on scroll
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('visible'), 80);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>

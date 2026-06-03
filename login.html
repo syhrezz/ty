@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Masuk WoodTrack</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Poppins','sans-serif']}}}}</script>
+  <style>
+    body{margin:0;min-height:100vh;font-family:'Poppins',sans-serif;background:linear-gradient(135deg,#f8fafc,#fef3c7 45%,#eff6ff);display:flex;align-items:center;justify-content:center;padding:24px}
+    .auth-card{max-width:420px;width:100%;background:#fff;border:1px solid #e2e8f0;border-radius:24px;box-shadow:0 24px 50px rgba(15,23,42,.08);overflow:hidden}
+    .auth-card header{padding:32px 28px 18px}
+    .auth-card main{padding:0 28px 32px;display:grid;gap:18px}
+    .auth-card h1{margin:0;font-size:1.8rem;line-height:1.1;color:#0f172a}
+    .auth-card p{margin:12px 0 0;color:#475569;line-height:1.75}
+    .field{width:100%;padding:14px 16px;border:1.5px solid #e2e8f0;border-radius:14px;font-size:14px;color:#0f172a;outline:none;transition:border-color .15s}
+    .field:focus{border-color:#d97706;box-shadow:0 0 0 4px rgba(217,119,6,.1)}
+    .btn-primary{width:100%;padding:14px 18px;background:#92400e;color:#fff;font-weight:700;border:none;border-radius:14px;cursor:pointer;transition:background .2s}
+    .btn-primary:hover{background:#b45309}
+    .link-row{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:14px}
+    .link-row a{color:#92400e;font-weight:600}
+    .footer-note{padding:18px 28px 26px;background:#f8fafc;color:#64748b;font-size:13px;text-align:center}
+  </style>
+</head>
+<body>
+  <div class="auth-card">
+    <header>
+      <p style="font-size:12px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.15em;margin-bottom:10px">WoodTrack Pro</p>
+      <h1>Masuk ke Dashboard Admin</h1>
+      <p>Gunakan akun admin Anda untuk membuka panel manajemen produksi dan stok.</p>
+    </header>
+    <main>
+      <label><span style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.08em">Email / Username</span><input class="field" type="text" placeholder="admin@woodtrack.local" required></label>
+      <label><span style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.08em">Kata sandi</span><input class="field" type="password" placeholder="••••••••" required></label>
+      <button class="btn-primary" type="button" onclick="location.href='pages/admin/index.html'">Masuk</button>
+      <div class="link-row"><a href="forgot-password.html">Lupa kata sandi?</a><a href="index.html">Kembali ke beranda</a></div>
+    </main>
+    <div class="footer-note">Jika Anda tidak memiliki akun, hubungi administrator sistem untuk akses.</div>
+  </div>
+</body>
+</html>
