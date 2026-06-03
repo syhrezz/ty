@@ -31,7 +31,12 @@ const SEED = {
     {id:'v7',pid:'p4',code:'JC-120-80',name:'Jendela Casement 120×80',p:120,l:80,t:3.5,finish:'Raw',m3Est:0.040},
   ],
   productions:[],
-  sales:[]
+  sales:[],
+  users:[
+    {id:'u1',name:'Andi Pratama',email:'andi@woodtrack.local',role:'admin',status:'active',team:'Manajemen'},
+    {id:'u2',name:'Rina Wulandari',email:'rina@woodtrack.local',role:'grader',status:'active',team:'PWA Grader'},
+    {id:'u3',name:'Budi Santoso',email:'budi@woodtrack.local',role:'grader',status:'inactive',team:'PWA Grader'}
+  ]
 };
 
 function loadDb(){try{const s=localStorage.getItem(KEY);return s?JSON.parse(s):JSON.parse(JSON.stringify(SEED))}catch{return JSON.parse(JSON.stringify(SEED))}}
@@ -41,6 +46,7 @@ let db=loadDb();
 db.sales=db.sales||[];
 db.crosscuts=db.crosscuts||[];
 db.kacas=db.kacas||[];
+db.users=db.users||[];
 
 // ═══════════════════════════════════
 //  UTILS
@@ -81,12 +87,14 @@ function prodStock(){
 const sizeLabel=id=>{const s=db.sizes.find(x=>x.id===id);return s?s.code:id};
 const variantLabel=id=>{const v=db.variants.find(x=>x.id===id);return v?v.name:id};
 const productName=id=>{const p=db.products.find(x=>x.id===id);return p?p.name:id};
+const escapeHtml=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
 // ═══════════════════════════════════
 //  ROUTER & SELECTION STATE
 // ═══════════════════════════════════
-let page=window.ADMIN_PAGE || 'dashboard', tabs={}, grSel={}, szSel={};
-  const PAGE_URLS={dashboard:'index.html',penerimaan:'penerimaan.html','penerimaan-log':'penerimaan-log.html','penerimaan-sawtimber':'penerimaan-sawtimber.html',konversi:'konversi.html',produksi:'produksi.html',penjualan:'penjualan.html',stok:'stok.html','master-produk':'master-produk.html','master-material':'master-material.html',riwayat:'riwayat.html',settings:'settings.html'};
+let page=window.ADMIN_PAGE || 'dashboard', tabs={}, grSel={}, szSel={}, userSearch='';
+let userModalState={show:false,role:'admin',id:null};
+const PAGE_URLS={dashboard:'index.html',penerimaan:'penerimaan.html','penerimaan-log':'penerimaan-log.html','penerimaan-sawtimber':'penerimaan-sawtimber.html',konversi:'konversi.html',produksi:'produksi.html',penjualan:'penjualan.html',stok:'stok.html','master-produk':'master-produk.html','master-material':'master-material.html','master-user':'master-user.html',riwayat:'riwayat.html',settings:'settings.html'};
 
 function go(p,tab=null){
   if(PAGE_URLS[p] && p!==page && !tab){ window.location.href=PAGE_URLS[p]; return; }
@@ -100,19 +108,99 @@ function go(p,tab=null){
   const titles={
     dashboard:'Dashboard',penerimaan:'Penerimaan Bahan Baku','penerimaan-log':'Penerimaan Log','penerimaan-sawtimber':'Penerimaan Sawtimber',konversi:'Konversi Log → Sawtimber',
     produksi:'Produksi',penjualan:'Penjualan Produk',stok:'Manajemen Stok','master-produk':'Master Produk & Varian',
-    'master-material':'Master Ukuran & Material',riwayat:'Riwayat Transaksi',settings:'Pengaturan Akun'
+    'master-material':'Master Ukuran & Material','master-user':'Master User & Grader',riwayat:'Riwayat Transaksi',settings:'Pengaturan Akun'
   };
   document.getElementById('tb-path').textContent=titles[p]||p;
   render();
 }
 
 function render(){
-  const renders={dashboard:pgDashboard,penerimaan:pgPenerimaan,'penerimaan-log':pgPenerimaan,'penerimaan-sawtimber':pgPenerimaan,konversi:pgKonversi,produksi:pgProduksi,penjualan:pgPenjualan,stok:pgStok,'master-produk':pgMasterProduk,'master-material':pgMasterMaterial,riwayat:pgRiwayat,settings:pgSettings};
+  const renders={dashboard:pgDashboard,penerimaan:pgPenerimaan,'penerimaan-log':pgPenerimaan,'penerimaan-sawtimber':pgPenerimaan,konversi:pgKonversi,produksi:pgProduksi,penjualan:pgPenjualan,stok:pgStok,'master-produk':pgMasterProduk,'master-material':pgMasterMaterial,'master-user':pgMasterUsers,riwayat:pgRiwayat,settings:pgSettings};
   document.getElementById('content').innerHTML=`<div class="fade-in">${(renders[page]||pgDashboard)()}</div>`;
   document.getElementById('tb-date').textContent=new Date().toLocaleDateString('id-ID',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
   restoreVis();
 }
 
+function filterUsers(role){
+  const query=userSearch.trim().toLowerCase();
+  return db.users.filter(u=>u.role===role && (!query || `${u.name} ${u.email} ${u.team||''}`.toLowerCase().includes(query)));
+}
+function getUserBadge(role){return role==='admin'?'<span class="pill pill-amber">Admin</span>':'<span class="pill pill-blue">Grader PWA</span>'}
+function getUserRows(list){
+  if(list.length===0)return `<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:20px">Belum ada pengguna untuk kategori ini</td></tr>`;
+  return list.map(u=>`<tr><td><strong>${escapeHtml(u.name)}</strong></td><td>${escapeHtml(u.email)}</td><td>${getUserBadge(u.role)}</td><td>${escapeHtml(u.team||'-')}</td><td><span class="pill ${u.status==='active'?'pill-green':'pill-ghost'}">${u.status==='active'?'Aktif':'Nonaktif'}</span></td><td style="white-space:nowrap"><button class="btn btn-ghost btn-sm" onclick="openUserModal('${u.id}')">Edit</button><button class="btn btn-danger btn-sm" onclick="confirmDeleteUser('${u.id}')">Hapus</button></td></tr>`).join('');
+}
+function updateUserSearch(value){userSearch=value;render();}
+function setMasterUserTab(tab){tabs['master-user']=tab;userSearch='';render();}
+function openUserModal(id=null, role='admin'){
+  userModalState.show=true;
+  userModalState.role=role;
+  userModalState.id=id;
+  const user=id?db.users.find(u=>u.id===id):null;
+  setTimeout(()=>{const field=document.querySelector('#user-modal input[name="name"]');field?.focus();},50);
+  render();
+}
+function closeUserModal(){userModalState.show=false;userModalState.id=null;render();}
+function saveUserForm(){
+  const form=document.getElementById('user-form');
+  const name=form.name.value.trim();
+  const email=form.email.value.trim();
+  const role=form.role.value;
+  const team=form.team.value.trim();
+  const status=form.status.value;
+  if(!name||!email){toast('Nama dan email wajib diisi','err');return;}
+  const duplicate=db.users.some(u=>u.email.toLowerCase()===email.toLowerCase() && u.id!==userModalState.id);
+  if(duplicate){toast('Email sudah digunakan','err');return;}
+  if(userModalState.id){
+    const user=db.users.find(u=>u.id===userModalState.id);
+    if(user){Object.assign(user,{name,email,role,team,status});}
+    toast('Data pengguna diperbarui','ok');
+  } else {
+    db.users.push({id:uid(),name,email,role,team,status});
+    toast('Pengguna baru ditambahkan','ok');
+  }
+  saveDb();
+  closeUserModal();
+}
+function confirmDeleteUser(id){
+  if(window.confirm('Hapus pengguna ini?')){deleteUser(id);}
+}
+function deleteUser(id){
+  db.users=db.users.filter(u=>u.id!==id);
+  saveDb();
+  toast('Pengguna dihapus','ok');
+  render();
+}
+
+function renderUserModal(role){
+  const isEdit=Boolean(userModalState.id);
+  const user=db.users.find(u=>u.id===userModalState.id) || {name:'',email:'',team:'',status:'active',role:role};
+  return `
+  <section class="modal-bg" id="user-modal">
+    <section class="modal-box">
+      <section style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px">
+        <div>
+          <h2 style="margin:0;font-size:18px;font-weight:800;color:#0f172a">${isEdit?'Edit Pengguna':'Tambah Pengguna Baru'}</h2>
+          <p style="margin:6px 0 0;color:#64748b;font-size:13px">Kelola Admin dan Grader PWA dengan cepat.</p>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="closeUserModal()">Batal</button>
+      </section>
+      <form id="user-form" onsubmit="event.preventDefault();saveUserForm();">
+        <section style="display:grid;gap:14px">
+          <div style="display:grid;gap:10px"><label class="lbl" for="name">Nama</label><input class="field" id="name" name="name" type="text" value="${escapeHtml(user.name)}" placeholder="Nama lengkap" required></div>
+          <div style="display:grid;gap:10px"><label class="lbl" for="email">Email</label><input class="field" id="email" name="email" type="email" value="${escapeHtml(user.email)}" placeholder="name@domain.com" required></div>
+          <div style="display:grid;gap:10px"><label class="lbl" for="team">Tim / Unit</label><input class="field" id="team" name="team" type="text" value="${escapeHtml(user.team)}" placeholder="Contoh: PWA Grader"></div>
+          <div style="display:grid;gap:10px"><label class="lbl" for="role">Peran</label><select class="field" id="role" name="role"><option value="admin" ${user.role==='admin'?'selected':''}>Admin</option><option value="grader" ${user.role==='grader'?'selected':''}>Grader PWA</option></select></div>
+          <div style="display:grid;gap:10px"><label class="lbl" for="status">Status</label><select class="field" id="status" name="status"><option value="active" ${user.status==='active'?'selected':''}>Aktif</option><option value="inactive" ${user.status==='inactive'?'selected':''}>Nonaktif</option></select></div>
+        </section>
+        <section style="display:flex;justify-content:flex-end;gap:10px;margin-top:22px">
+          <button type="button" class="btn btn-ghost" onclick="closeUserModal()">Batal</button>
+          <button type="submit" class="btn btn-amber">Simpan</button>
+        </section>
+      </form>
+    </section>
+  </section>`;
+}
 function restoreVis(){
   Object.entries(grSel).forEach(([pfx,g])=>applyGrVis(pfx,g));
   Object.entries(szSel).forEach(([pfx,id])=>{
@@ -208,6 +296,59 @@ function pgDashboard(){
     <section class="card-header"><span style="font-size:13px;font-weight:800">Aktivitas Terkini</span><button class="btn btn-ghost btn-sm" onclick="go('riwayat')">Lihat Semua</button></section>
     <section class="card-body" style="padding:0">${acts.length===0?`<section class="empty"><p style="font-size:13px">Belum ada aktivitas</p></section>`:`<table class="tbl"><thead><tr><th>Jenis</th><th>Material / Produk</th><th>Grade</th><th>Qty</th><th>Tanggal</th></tr></thead><tbody>${acts.map(a=>activityRow(a)).join('')}</tbody></table>`}</section>
   </section>`;
+}
+
+function pgMasterUsers(){
+  const current=tabs['master-user']||new URLSearchParams(location.search).get('tab')||'admin';
+  const users=filterUsers(current);
+  const total=db.users.filter(u=>u.role===current).length;
+  const active=db.users.filter(u=>u.role===current && u.status==='active').length;
+  const inactive=total-active;
+  const subtitle=current==='admin'?'Kelola akun administrator untuk panel admin':'Kelola grader yang memakai aplikasi PWA';
+  return `
+  <section class="dashboard-hero">
+    <section class="dashboard-welcome">
+      <h1>Pengaturan Master User</h1>
+      <p>Atur akun administrator dan grader PWA dalam satu tempat. Tambahkan, sunting, dan aktifkan akses dengan cepat untuk menjaga alur operasional tetap lancar.</p>
+      <div class="dashboard-actions">
+        <button class="btn btn-blue" onclick="openUserModal(null,'${current}')">Tambah ${current==='admin'?'Admin':'Grader'}</button>
+        <button class="btn btn-ghost" onclick="setMasterUserTab('${current==='admin'?'grader':'admin'}')">Lihat ${current==='admin'?'Grader':'Admin'}</button>
+      </div>
+    </section>
+    <section class="dashboard-side-card">
+      <h2>Ringkasan ${current==='admin'?'Admin':'Grader'}</h2>
+      <section class="dashboard-mini-stat"><span>Total akun</span><strong>${total}</strong></section>
+      <section class="dashboard-mini-stat"><span>Aktif</span><strong>${active}</strong></section>
+      <section class="dashboard-mini-stat"><span>Nonaktif</span><strong>${inactive}</strong></section>
+      <section class="dashboard-mini-stat"><span>Status saat ini</span><strong>${current==='admin'?'Akses backend':'Akses aplikasi PWA'}</strong></section>
+    </section>
+  </section>
+
+  <section class="card">
+    <section class="card-header" style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+      <div>
+        <p style="font-size:13px;font-weight:800">${current==='admin'?'Administrators':'Grader PWA'}</p>
+        <p style="margin:6px 0 0;color:#64748b;font-size:13px">${subtitle}</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <button class="tab-btn ${current==='admin'?'active':''}" onclick="setMasterUserTab('admin')">Admin</button>
+        <button class="tab-btn ${current==='grader'?'active':''}" onclick="setMasterUserTab('grader')">Grader PWA</button>
+      </div>
+    </section>
+    <section class="card-body" style="display:grid;gap:18px">
+      <div style="display:grid;gap:14px">
+        <div style="display:grid;gap:10px;max-width:400px"><label class="lbl">Cari pengguna</label><input class="field" type="search" placeholder="Cari nama, email, tim" value="${escapeHtml(userSearch)}" oninput="updateUserSearch(this.value)"></div>
+      </div>
+      <div style="overflow:auto">
+        <table class="tbl">
+          <thead><tr><th>Nama</th><th>Email</th><th>Peran</th><th>Tim</th><th>Status</th><th>Aksi</th></tr></thead>
+          <tbody>${getUserRows(users)}</tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+  ${userModalState.show?renderUserModal(current):''}
+  `;
 }
 
 function pgSettings(){
